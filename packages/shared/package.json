@@ -1,0 +1,15 @@
+{
+    "name": "@sweet-cake/shared",
+    "version": "1.0.0",
+    "description": "Types et constantes partages pour Sweet-Cake",
+    "private": true,
+    "main": "src/index.ts",
+    "types": "src/index.ts",
+    "scripts": {
+        "build": "tsc",
+        "lint": "eslint \"src/**/*.ts\""
+    },
+    "devDependencies": {
+        "typescript": "^5.3.3"
+    }
+}

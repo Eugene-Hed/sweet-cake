@@ -1,0 +1,339 @@
+// =============================================================================
+// Sweet-Cake — Schema Prisma (MySQL 8)
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================================================
+// UTILISATEURS
+// =============================================================================
+model utilisateurs {
+  id               Int       @id @default(autoincrement())
+  nom_complet      String    @db.VarChar(255)
+  email            String    @unique @db.VarChar(255)
+  mot_de_passe_hash String   @db.VarChar(255)
+  telephone        String?   @db.VarChar(20)
+  role             RoleUtilisateur @default(client)
+  est_actif        Boolean   @default(true)
+  langue_preferee  String    @default("fr") @db.VarChar(5)
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+  deleted_at       DateTime?
+
+  // Relations
+  commandes                commandes[]
+  reservations_atelier     reservations_atelier[]
+  jetons_rafraichissement  jetons_rafraichissement[]
+  journaux_audit           journaux_audit[]
+  ateliers_crees           ateliers[]               @relation("AtelierCreateur")
+  historiques_statut       historiques_statut_commande[] @relation("ChangePar")
+  mouvements_stock_crees   mouvements_stock[]       @relation("MouvementCreateur")
+
+  @@index([email])
+  @@index([role])
+  @@index([est_actif])
+  @@index([deleted_at])
+}
+
+enum RoleUtilisateur {
+  client
+  administrateur
+  gestionnaire
+  formateur
+}
+
+// =============================================================================
+// CATEGORIES
+// =============================================================================
+model categories {
+  id          Int       @id @default(autoincrement())
+  nom         String    @db.VarChar(255)
+  description String?   @db.Text
+  est_active  Boolean   @default(true)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  deleted_at  DateTime?
+
+  // Relations
+  produits    produits[]
+
+  @@index([nom])
+  @@index([est_active])
+  @@index([deleted_at])
+}
+
+// =============================================================================
+// PRODUITS
+// =============================================================================
+model produits {
+  id             Int       @id @default(autoincrement())
+  categorie_id   Int
+  nom            String    @db.VarChar(255)
+  description    String?   @db.Text
+  prix           Decimal   @db.Decimal(10, 2)
+  image_url      String?   @db.VarChar(500)
+  est_disponible Boolean   @default(true)
+  est_actif      Boolean   @default(true)
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+  deleted_at     DateTime?
+
+  // Relations
+  categorie       categories       @relation(fields: [categorie_id], references: [id])
+  lignes_commande lignes_commande[]
+
+  @@index([categorie_id])
+  @@index([nom])
+  @@index([est_disponible])
+  @@index([est_actif])
+  @@index([deleted_at])
+}
+
+// =============================================================================
+// COMMANDES
+// =============================================================================
+model commandes {
+  id               Int              @id @default(autoincrement())
+  client_id        Int
+  numero_commande  String           @unique @db.VarChar(50)
+  type_commande    TypeCommande     @default(retrait)
+  statut           StatutCommande   @default(en_attente)
+  statut_paiement  StatutPaiement   @default(non_paye)
+  montant_total    Decimal          @db.Decimal(12, 2) @default(0)
+  planifiee_pour   DateTime?
+  notes            String?          @db.Text
+  created_at       DateTime         @default(now())
+  updated_at       DateTime         @updatedAt
+  annulee_at       DateTime?
+
+  // Relations
+  client                      utilisateurs                 @relation(fields: [client_id], references: [id])
+  lignes_commande             lignes_commande[]
+  historiques_statut_commande historiques_statut_commande[]
+
+  @@index([client_id])
+  @@index([numero_commande])
+  @@index([statut])
+  @@index([statut_paiement])
+  @@index([created_at])
+}
+
+enum TypeCommande {
+  retrait
+  livraison
+}
+
+enum StatutCommande {
+  en_attente
+  confirmee
+  en_preparation
+  prete
+  terminee
+  annulee
+}
+
+enum StatutPaiement {
+  non_paye
+  en_attente
+  paye
+  annule
+}
+
+// =============================================================================
+// LIGNES DE COMMANDE
+// =============================================================================
+model lignes_commande {
+  id            Int      @id @default(autoincrement())
+  commande_id   Int
+  produit_id    Int
+  quantite      Int
+  prix_unitaire Decimal  @db.Decimal(10, 2)
+  sous_total    Decimal  @db.Decimal(12, 2)
+  created_at    DateTime @default(now())
+
+  // Relations
+  commande commandes @relation(fields: [commande_id], references: [id], onDelete: Cascade)
+  produit  produits  @relation(fields: [produit_id], references: [id])
+
+  @@index([commande_id])
+  @@index([produit_id])
+}
+
+// =============================================================================
+// HISTORIQUES STATUT COMMANDE
+// =============================================================================
+model historiques_statut_commande {
+  id             Int            @id @default(autoincrement())
+  commande_id    Int
+  ancien_statut  StatutCommande
+  nouveau_statut StatutCommande
+  change_par     Int
+  note           String?        @db.Text
+  changed_at     DateTime       @default(now())
+
+  // Relations
+  commande    commandes    @relation(fields: [commande_id], references: [id], onDelete: Cascade)
+  utilisateur utilisateurs @relation("ChangePar", fields: [change_par], references: [id])
+
+  @@index([commande_id])
+  @@index([changed_at])
+}
+
+// =============================================================================
+// ATELIERS
+// =============================================================================
+model ateliers {
+  id               Int           @id @default(autoincrement())
+  titre            String        @db.VarChar(255)
+  description      String?       @db.Text
+  date_atelier     DateTime      @db.Date
+  heure_debut      String        @db.VarChar(5)
+  heure_fin        String        @db.VarChar(5)
+  capacite         Int
+  places_reservees Int           @default(0)
+  prix             Decimal       @db.Decimal(10, 2)
+  statut           StatutAtelier @default(planifie)
+  cree_par         Int
+  created_at       DateTime      @default(now())
+  updated_at       DateTime      @updatedAt
+  deleted_at       DateTime?
+
+  // Relations
+  createur              utilisateurs           @relation("AtelierCreateur", fields: [cree_par], references: [id])
+  reservations_atelier  reservations_atelier[]
+
+  @@index([date_atelier])
+  @@index([statut])
+  @@index([cree_par])
+  @@index([deleted_at])
+}
+
+enum StatutAtelier {
+  planifie
+  complet
+  termine
+  annule
+}
+
+// =============================================================================
+// RESERVATIONS ATELIER
+// =============================================================================
+model reservations_atelier {
+  id            Int                  @id @default(autoincrement())
+  atelier_id    Int
+  client_id     Int
+  nombre_places Int
+  montant_total Decimal              @db.Decimal(10, 2)
+  statut        StatutReservation    @default(en_attente)
+  created_at    DateTime             @default(now())
+  updated_at    DateTime             @updatedAt
+  annulee_at    DateTime?
+
+  // Relations
+  atelier ateliers     @relation(fields: [atelier_id], references: [id])
+  client  utilisateurs @relation(fields: [client_id], references: [id])
+
+  @@index([atelier_id])
+  @@index([client_id])
+  @@index([statut])
+}
+
+enum StatutReservation {
+  en_attente
+  confirmee
+  annulee
+}
+
+// =============================================================================
+// ARTICLES STOCK
+// =============================================================================
+model articles_stock {
+  id            Int       @id @default(autoincrement())
+  nom           String    @db.VarChar(255)
+  unite         String    @db.VarChar(50)
+  quantite      Decimal   @db.Decimal(12, 3) @default(0)
+  seuil_minimal Decimal   @db.Decimal(12, 3) @default(0)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
+
+  // Relations
+  mouvements_stock mouvements_stock[]
+
+  @@index([nom])
+  @@index([deleted_at])
+}
+
+// =============================================================================
+// MOUVEMENTS STOCK
+// =============================================================================
+model mouvements_stock {
+  id                Int             @id @default(autoincrement())
+  article_stock_id  Int
+  type_mouvement    TypeMouvement
+  quantite          Decimal         @db.Decimal(12, 3)
+  raison            String?         @db.Text
+  cree_par          Int
+  created_at        DateTime        @default(now())
+
+  // Relations
+  article_stock articles_stock @relation(fields: [article_stock_id], references: [id])
+  createur      utilisateurs   @relation("MouvementCreateur", fields: [cree_par], references: [id])
+
+  @@index([article_stock_id])
+  @@index([type_mouvement])
+  @@index([created_at])
+}
+
+enum TypeMouvement {
+  entree
+  sortie
+  ajustement
+}
+
+// =============================================================================
+// JOURNAUX AUDIT
+// =============================================================================
+model journaux_audit {
+  id             Int      @id @default(autoincrement())
+  utilisateur_id Int?
+  action         String   @db.VarChar(255)
+  type_entite    String   @db.VarChar(100)
+  entite_id      String?  @db.VarChar(50)
+  metadonnees    Json?
+  created_at     DateTime @default(now())
+
+  // Relations
+  utilisateur utilisateurs? @relation(fields: [utilisateur_id], references: [id])
+
+  @@index([utilisateur_id])
+  @@index([type_entite])
+  @@index([action])
+  @@index([created_at])
+}
+
+// =============================================================================
+// JETONS RAFRAICHISSEMENT
+// =============================================================================
+model jetons_rafraichissement {
+  id             Int       @id @default(autoincrement())
+  utilisateur_id Int
+  jeton_hash     String    @db.VarChar(255)
+  expires_at     DateTime
+  revoked_at     DateTime?
+  created_at     DateTime  @default(now())
+
+  // Relations
+  utilisateur utilisateurs @relation(fields: [utilisateur_id], references: [id], onDelete: Cascade)
+
+  @@index([utilisateur_id])
+  @@index([jeton_hash])
+  @@index([expires_at])
+}

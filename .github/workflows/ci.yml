@@ -1,0 +1,144 @@
+# =============================================================================
+# Sweet-Cake — Pipeline CI/CD
+# =============================================================================
+name: CI Sweet-Cake
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # --- Qualite de code ---
+  qualite:
+    name: Qualite de code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Configuration Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Installation des dependances
+        run: npm ci
+
+      - name: Verification du lint
+        run: npm run lint
+
+      - name: Verification du formatage
+        run: npx prettier --check .
+
+  # --- Tests ---
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    needs: qualite
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root_test
+          MYSQL_DATABASE: sweet_cake_test
+          MYSQL_USER: test_user
+          MYSQL_PASSWORD: test_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DATABASE_URL: mysql://test_user:test_password@localhost:3306/sweet_cake_test
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+      JWT_SECRET: test-jwt-secret
+      JWT_REFRESH_SECRET: test-refresh-secret
+      JWT_ACCESS_EXPIRATION: 15m
+      JWT_REFRESH_EXPIRATION: 7d
+      BCRYPT_SALT_ROUNDS: 4
+      NODE_ENV: test
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Configuration Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Installation des dependances
+        run: npm ci
+
+      - name: Generation Prisma
+        run: npx prisma generate --schema=prisma/schema.prisma
+
+      - name: Migrations Prisma
+        run: npx prisma migrate deploy --schema=prisma/schema.prisma
+
+      - name: Tests unitaires
+        run: npm run test -- --coverage
+
+      - name: Tests E2E
+        run: npm run test:e2e
+
+  # --- Build ---
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: tests
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Configuration Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Installation des dependances
+        run: npm ci
+
+      - name: Generation Prisma
+        run: npx prisma generate --schema=prisma/schema.prisma
+
+      - name: Validation du schema Prisma
+        run: npx prisma validate --schema=prisma/schema.prisma
+
+      - name: Build du projet
+        run: npm run build
+
+  # --- Docker ---
+  docker:
+    name: Build Docker
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Build de l'image Docker
+        run: docker build -f apps/api/Dockerfile --target production -t sweet-cake-api:latest .

@@ -1,0 +1,83 @@
+# =============================================================================
+# Sweet-Cake — Docker Compose pour le developpement local
+# =============================================================================
+version: '3.8'
+
+services:
+  # --- API NestJS ---
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: development
+    container_name: sweet-cake-api
+    ports:
+      - '${PORT:-3000}:3000'
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=mysql://${MYSQL_USER:-sweet_cake_user}:${MYSQL_PASSWORD:-sweet_cake_password_dev}@mysql:3306/${MYSQL_DATABASE:-sweet_cake_db}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - sweet-cake-network
+
+  # --- MySQL 8 ---
+  mysql:
+    image: mysql:8.0
+    container_name: sweet-cake-mysql
+    ports:
+      - '${MYSQL_PORT:-3306}:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password_dev}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-sweet_cake_db}
+      MYSQL_USER: ${MYSQL_USER:-sweet_cake_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-sweet_cake_password_dev}
+    volumes:
+      - sweet-cake-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - sweet-cake-network
+
+  # --- Redis ---
+  redis:
+    image: redis:7-alpine
+    container_name: sweet-cake-redis
+    ports:
+      - '${REDIS_PORT:-6379}:6379'
+    volumes:
+      - sweet-cake-redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - sweet-cake-network
+
+volumes:
+  sweet-cake-mysql-data:
+    driver: local
+  sweet-cake-redis-data:
+    driver: local
+
+networks:
+  sweet-cake-network:
+    driver: bridge
