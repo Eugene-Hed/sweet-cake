@@ -39,7 +39,7 @@ export class AuthentificationService {
         }
 
         // Hacher le mot de passe
-        const tours = this.configService.get<number>('BCRYPT_SALT_ROUNDS', 12);
+        const tours = Number(this.configService.get<number>('BCRYPT_SALT_ROUNDS', 12));
         const motDePasseHash = await bcrypt.hash(dto.mot_de_passe, tours);
 
         // Créer l'utilisateur

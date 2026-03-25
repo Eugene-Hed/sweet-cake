@@ -1,40 +1,69 @@
 // =============================================================================
-// Sweet-Cake Mobile — Composant ChampSaisie
+// Sweet-Cake Mobile — Composant ChampSaisie (Design Premium)
 // =============================================================================
 
-import React, { useState } from 'react';
-import { View, TextInput, Text, StyleSheet, TextInputProps } from 'react-native';
+import React, { useState, useRef } from 'react';
+import {
+    View, TextInput, Text, StyleSheet, TextInputProps,
+    Platform, TouchableWithoutFeedback
+} from 'react-native';
 import { couleurs, rayons, espacements, typographie } from '@sweet-cake/shared';
 
-interface ChampSaisieProps extends Omit<TextInputProps, 'style'> {
+interface ChampSaisieProps extends TextInputProps {
     label?: string;
     erreur?: string;
     iconeGauche?: React.ReactNode;
+    iconeDroite?: React.ReactNode;
 }
 
-export default function ChampSaisie({ label, erreur, iconeGauche, ...props }: ChampSaisieProps) {
+export default function ChampSaisie({ label, erreur, iconeGauche, iconeDroite, style, ...props }: ChampSaisieProps) {
     const [estFocus, setEstFocus] = useState(false);
+    const inputRef = useRef<TextInput>(null);
 
     const bordure = erreur
-        ? couleurs.erreur.defaut
+        ? '#ef4444'
         : estFocus
-            ? couleurs.primaire.defaut
-            : couleurs.gris[300];
+            ? '#b59a5d' // Gold premium au lieu du rose
+            : '#e2e8f0';
+
+    const fondChamp = estFocus ? '#ffffff' : '#f8fafc';
 
     return (
         <View style={styles.conteneur}>
             {label && <Text style={styles.label}>{label}</Text>}
-            <View style={[styles.champConteneur, { borderColor: bordure }]}>
-                {iconeGauche && <View style={styles.icone}>{iconeGauche}</View>}
-                <TextInput
-                    style={styles.input}
-                    placeholderTextColor={couleurs.gris[400]}
-                    onFocus={() => setEstFocus(true)}
-                    onBlur={() => setEstFocus(false)}
-                    {...props}
-                />
-            </View>
-            {erreur && <Text style={styles.erreur}>{erreur}</Text>}
+            <TouchableWithoutFeedback onPress={() => inputRef.current?.focus()}>
+                <View
+                    style={[
+                        styles.champConteneur,
+                        {
+                            borderColor: bordure,
+                            backgroundColor: fondChamp,
+                        },
+                        estFocus && Platform.select({
+                            ios: {
+                                shadowColor: '#b59a5d',
+                                shadowOffset: { width: 0, height: 4 },
+                                shadowOpacity: 0.1,
+                                shadowRadius: 10,
+                            },
+                            android: { elevation: 2 },
+                        }),
+                    ]}
+                >
+                    {iconeGauche && <View style={styles.icone}>{iconeGauche}</View>}
+                    <TextInput
+                        ref={inputRef}
+                        style={[styles.input, style]}
+                        placeholderTextColor="#94a3b8"
+                        onFocus={() => setEstFocus(true)}
+                        onBlur={() => setEstFocus(false)}
+                        selectionColor="#b59a5d"
+                        {...props}
+                    />
+                    {iconeDroite && <View style={styles.iconeDroite}>{iconeDroite}</View>}
+                </View>
+            </TouchableWithoutFeedback>
+            {erreur && <Text style={styles.erreur}>⚠ {erreur}</Text>}
         </View>
     );
 }
@@ -44,31 +73,39 @@ const styles = StyleSheet.create({
         marginBottom: espacements.md,
     },
     label: {
-        fontSize: typographie.texte_secondaire.taille,
-        fontWeight: '600',
-        color: couleurs.gris[700],
-        marginBottom: espacements.xs,
+        fontSize: 13,
+        fontWeight: '700',
+        color: '#64748b',
+        marginBottom: 8,
+        letterSpacing: 0.5,
+        textTransform: 'uppercase'
     },
     champConteneur: {
         flexDirection: 'row',
         alignItems: 'center',
         borderWidth: 1.5,
-        borderRadius: rayons.md,
-        backgroundColor: couleurs.blanc,
-        height: 48,
-        paddingHorizontal: espacements.md_sm,
+        borderRadius: 16,
+        minHeight: 56,
+        paddingHorizontal: 16,
+        backgroundColor: '#f8fafc',
     },
     icone: {
-        marginRight: espacements.sm,
+        marginRight: 10,
+    },
+    iconeDroite: {
+        marginLeft: 10,
     },
     input: {
         flex: 1,
-        fontSize: typographie.texte_corps.taille,
-        color: couleurs.gris[900],
+        fontSize: 15,
+        color: '#1e293b',
+        fontWeight: '600',
+        paddingVertical: 12,
     },
     erreur: {
-        fontSize: typographie.legende.taille,
+        fontSize: 12,
         color: couleurs.erreur.defaut,
-        marginTop: espacements.xs,
+        marginTop: 4,
+        fontWeight: '500',
     },
 });

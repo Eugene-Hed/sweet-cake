@@ -1,37 +1,35 @@
 // =============================================================================
-// Sweet-Cake Mobile — Gestion Commandes Admin
+// Sweet-Cake Mobile — Gestion des Commandes Admin (iOS 26 Style)
 // =============================================================================
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, RefreshControl } from 'react-native';
+import {
+    View, Text, ScrollView, StyleSheet, RefreshControl,
+    Platform, TouchableOpacity, Dimensions
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { couleurs, espacements, typographie, rayons } from '@sweet-cake/shared';
-import { TRANSITIONS_STATUT_COMMANDE } from '@sweet-cake/shared';
 import api from '../../src/services/api';
 import Badge, { BADGE_STATUT_COMMANDE } from '../../src/composants/Badge';
 import Chargement from '../../src/composants/Chargement';
 
-const LABELS_STATUT: Record<string, string> = {
-    en_attente: 'En attente',
-    confirmee: 'Confirmée',
-    en_preparation: 'En préparation',
-    prete: 'Prête',
-    terminee: 'Terminée',
-    annulee: 'Annulée',
-};
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function CommandesAdmin() {
     const [commandes, setCommandes] = useState<any[]>([]);
     const [chargement, setChargement] = useState(true);
-    const [commandeOuverte, setCommandeOuverte] = useState<number | null>(null);
+    const [rafraichissant, setRafraichissant] = useState(false);
 
     const charger = async () => {
         try {
-            const { data } = await api.get('/commandes?limite=50');
+            const { data } = await api.get('/commandes?limite=20');
             setCommandes(data.donnees || []);
         } catch (err) {
             console.error('Erreur commandes admin:', err);
         } finally {
             setChargement(false);
+            setRafraichissant(false);
         }
     };
 
@@ -40,10 +38,9 @@ export default function CommandesAdmin() {
     const changerStatut = async (id: number, nouveauStatut: string) => {
         try {
             await api.patch(`/commandes/${id}/statut`, { statut: nouveauStatut });
-            Alert.alert('✅', `Statut changé en "${LABELS_STATUT[nouveauStatut]}"`);
             charger();
-        } catch (err: any) {
-            Alert.alert('Erreur', err.response?.data?.message || 'Changement impossible');
+        } catch (err) {
+            console.error('Erreur statut:', err);
         }
     };
 
@@ -52,108 +49,149 @@ export default function CommandesAdmin() {
     return (
         <ScrollView
             style={styles.conteneur}
-            refreshControl={<RefreshControl refreshing={false} onRefresh={charger} tintColor={couleurs.secondaire.defaut} />}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 120 }}
+            refreshControl={
+                <RefreshControl
+                    refreshing={rafraichissant}
+                    onRefresh={() => { setRafraichissant(true); charger(); }}
+                    tintColor={couleurs.secondaire.defaut}
+                />
+            }
         >
             <View style={styles.padding}>
-                <Text style={styles.compteur}>{commandes.length} commande(s)</Text>
-
-                {commandes.map((c) => {
-                    const transitions = TRANSITIONS_STATUT_COMMANDE[c.statut] || [];
-                    const estOuverte = commandeOuverte === c.id;
-
-                    return (
-                        <TouchableOpacity
-                            key={c.id}
-                            style={styles.carte}
-                            onPress={() => setCommandeOuverte(estOuverte ? null : c.id)}
-                            activeOpacity={0.8}
-                        >
+                {commandes.length > 0 ? (
+                    commandes.map((c) => (
+                        <View key={c.id} style={styles.carteGlass}>
                             <View style={styles.entete}>
                                 <View>
                                     <Text style={styles.id}>Commande #{c.id}</Text>
-                                    <Text style={styles.client}>{c.client?.nom_complet || '—'}</Text>
+                                    <Text style={styles.date}>
+                                        {new Date(c.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                                    </Text>
                                 </View>
                                 <Badge
-                                    texte={LABELS_STATUT[c.statut] || c.statut}
+                                    texte={c.statut.replace('_', ' ')}
                                     variante={BADGE_STATUT_COMMANDE[c.statut] || 'neutre'}
                                 />
                             </View>
 
-                            <View style={styles.details}>
-                                <Text style={styles.detailTexte}>
-                                    📅 {new Date(c.created_at).toLocaleDateString('fr-FR')}
-                                </Text>
-                                <Text style={styles.total}>{Number(c.total).toFixed(2)} €</Text>
+                            <View style={styles.clientInfo}>
+                                <View style={styles.avatarMini}>
+                                    <Text style={styles.avatarTexte}>{c.client?.nom_complet?.charAt(0) || '?'}</Text>
+                                </View>
+                                <View>
+                                    <Text style={styles.clientNom}>{c.client?.nom_complet || 'Client inconnu'}</Text>
+                                    <Text style={styles.clientTel}>{c.client?.telephone || 'Pas de numéro'}</Text>
+                                </View>
                             </View>
 
-                            {/* Lignes commande (affiché si ouvert) */}
-                            {estOuverte && (
-                                <View style={styles.expansion}>
-                                    <Text style={styles.expansionTitre}>Articles :</Text>
-                                    {(c.lignes || []).map((l: any, i: number) => (
-                                        <Text key={i} style={styles.ligneProduit}>
-                                            • {l.produit?.nom || `Produit #${l.produit_id}`} × {l.quantite} — {Number(l.prix_unitaire).toFixed(2)} €
+                            <View style={styles.produitsSection}>
+                                {c.lignes?.map((l: any, idx: number) => (
+                                    <View key={idx} style={styles.produitLigne}>
+                                        <View style={styles.puce} />
+                                        <Text style={styles.produitTexte} numberOfLines={1}>
+                                            <Text style={styles.quantite}>{l.quantite}x</Text> {l.produit?.nom}
                                         </Text>
-                                    ))}
+                                    </View>
+                                ))}
+                            </View>
 
-                                    {/* Actions de statut */}
-                                    {transitions.length > 0 && (
-                                        <View style={styles.actions}>
-                                            {transitions.map((s) => (
-                                                <TouchableOpacity
-                                                    key={s}
-                                                    style={[
-                                                        styles.actionBtn,
-                                                        s === 'annulee' && styles.actionBtnDanger,
-                                                    ]}
-                                                    onPress={() => changerStatut(c.id, s)}
-                                                >
-                                                    <Text
-                                                        style={[
-                                                            styles.actionBtnTexte,
-                                                            s === 'annulee' && styles.actionBtnTexteDanger,
-                                                        ]}
-                                                    >
-                                                        {s === 'annulee' ? '✕ Annuler' : `→ ${LABELS_STATUT[s]}`}
-                                                    </Text>
-                                                </TouchableOpacity>
-                                            ))}
-                                        </View>
+                            <View style={styles.pied}>
+                                <View>
+                                    <Text style={styles.totalLabel}>Total TTC</Text>
+                                    <Text style={styles.total}>{Number(c.montant_total).toLocaleString()} FCFA</Text>
+                                </View>
+
+                                <View style={styles.actions}>
+                                    {c.statut === 'en_attente' && (
+                                        <TouchableOpacity onPress={() => changerStatut(c.id, 'confirmee')}>
+                                            <LinearGradient colors={['#27ae60', '#2ecc71']} style={styles.actionBtn}>
+                                                <Ionicons name="checkmark" size={20} color="#fff" />
+                                            </LinearGradient>
+                                        </TouchableOpacity>
+                                    )}
+                                    {c.statut === 'confirmee' && (
+                                        <TouchableOpacity onPress={() => changerStatut(c.id, 'en_preparation')}>
+                                            <LinearGradient colors={['#e67e22', '#f39c12']} style={styles.actionBtn}>
+                                                <Ionicons name="hammer-outline" size={20} color="#fff" />
+                                            </LinearGradient>
+                                        </TouchableOpacity>
+                                    )}
+                                    {c.statut === 'en_preparation' && (
+                                        <TouchableOpacity onPress={() => changerStatut(c.id, 'prete')}>
+                                            <LinearGradient colors={['#2980b9', '#3498db']} style={styles.actionBtn}>
+                                                <Ionicons name="gift-outline" size={20} color="#fff" />
+                                            </LinearGradient>
+                                        </TouchableOpacity>
                                     )}
                                 </View>
-                            )}
-                        </TouchableOpacity>
-                    );
-                })}
+                            </View>
+                        </View>
+                    ))
+                ) : (
+                    <View style={styles.vide}>
+                        <Ionicons name="receipt-outline" size={64} color={couleurs.gris[300]} />
+                        <Text style={styles.videTexte}>Aucune commande pour le moment</Text>
+                    </View>
+                )}
             </View>
         </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
-    conteneur: { flex: 1, backgroundColor: couleurs.gris[50] },
-    padding: { padding: espacements.md },
-    compteur: { fontSize: typographie.texte_secondaire.taille, color: couleurs.gris[500], marginBottom: espacements.md },
-    carte: {
-        backgroundColor: couleurs.blanc, borderRadius: rayons.lg,
-        padding: espacements.md, marginBottom: espacements.md,
-        borderWidth: 1, borderColor: couleurs.gris[200],
+    conteneur: { flex: 1, backgroundColor: '#f8fafc' },
+    padding: { padding: 16 },
+    carteGlass: {
+        backgroundColor: '#ffffff',
+        borderRadius: 24,
+        padding: 20,
+        marginBottom: 16,
+        borderWidth: 1,
+        borderColor: '#f1f5f9',
+        ...Platform.select({
+            ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 12 },
+            android: { elevation: 3 },
+        }),
     },
-    entete: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-    id: { fontSize: typographie.texte_corps.taille, fontWeight: '700', color: couleurs.gris[900] },
-    client: { fontSize: typographie.texte_secondaire.taille, color: couleurs.gris[600], marginTop: 2 },
-    details: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 12, alignItems: 'center' },
-    detailTexte: { fontSize: typographie.texte_secondaire.taille, color: couleurs.gris[500] },
-    total: { fontSize: typographie.texte_corps.taille, fontWeight: '700', color: couleurs.primaire.defaut },
-    expansion: { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: couleurs.gris[200] },
-    expansionTitre: { fontSize: typographie.texte_secondaire.taille, fontWeight: '600', color: couleurs.gris[700], marginBottom: 4 },
-    ligneProduit: { fontSize: typographie.texte_secondaire.taille, color: couleurs.gris[600], marginBottom: 2 },
-    actions: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 12, gap: 8 },
-    actionBtn: {
-        paddingHorizontal: 14, paddingVertical: 8, borderRadius: rayons.md,
-        backgroundColor: couleurs.primaire.clair,
+    entete: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
+    id: { fontSize: 16, fontWeight: '800', color: '#0f172a' },
+    date: { fontSize: 13, color: '#64748b', marginTop: 2 },
+    clientInfo: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 16 },
+    avatarMini: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: '#f1f5f9',
+        justifyContent: 'center',
+        alignItems: 'center'
     },
-    actionBtnDanger: { backgroundColor: couleurs.erreur.clair },
-    actionBtnTexte: { fontSize: typographie.legende.taille, fontWeight: '600', color: couleurs.primaire.fonce },
-    actionBtnTexteDanger: { color: couleurs.erreur.fonce },
+    avatarTexte: { fontSize: 14, fontWeight: '700', color: couleurs.primaire.defaut },
+    clientNom: { fontSize: 15, fontWeight: '700', color: '#1e293b' },
+    clientTel: { fontSize: 12, color: '#94a3b8' },
+    produitsSection: {
+        backgroundColor: '#f8fafc',
+        padding: 12,
+        borderRadius: 16,
+        marginBottom: 16,
+    },
+    produitLigne: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
+    puce: { width: 4, height: 4, borderRadius: 2, backgroundColor: couleurs.primaire.defaut },
+    produitTexte: { fontSize: 13, color: '#475569', flex: 1 },
+    quantite: { fontWeight: '800', color: '#1e293b' },
+    pied: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderTopWidth: 1,
+        borderTopColor: '#f1f5f9',
+        paddingTop: 16
+    },
+    totalLabel: { fontSize: 11, fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 },
+    total: { fontSize: 20, fontWeight: '900', color: couleurs.primaire.defaut, marginTop: 2 },
+    actions: { flexDirection: 'row', gap: 10 },
+    actionBtn: { width: 44, height: 44, borderRadius: 14, justifyContent: 'center', alignItems: 'center' },
+    vide: { alignItems: 'center', justifyContent: 'center', padding: 100, gap: 16 },
+    videTexte: { fontSize: 15, color: '#94a3b8', fontWeight: '600', textAlign: 'center' },
 });

@@ -1,6 +1,7 @@
 import { IsNotEmpty, IsString, IsNumber, IsOptional, IsBoolean, IsInt, MaxLength, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { PaginationDto } from '../../../commun/dto/pagination.dto';
 
 export class CreerProduitDto {
     @ApiProperty({ description: 'ID de la catégorie', example: 1 })
@@ -31,6 +32,16 @@ export class CreerProduitDto {
     @IsString()
     @MaxLength(500)
     image_url?: string;
+
+    @ApiPropertyOptional({ description: 'Est disponible en stock' })
+    @IsOptional()
+    @IsBoolean()
+    est_disponible?: boolean;
+
+    @ApiPropertyOptional({ description: 'Est affiché sur le catalogue' })
+    @IsOptional()
+    @IsBoolean()
+    est_actif?: boolean;
 }
 
 export class MettreAJourProduitDto {
@@ -73,7 +84,7 @@ export class MettreAJourProduitDto {
     est_actif?: boolean;
 }
 
-export class FiltreProduitsDto {
+export class FiltreProduitsDto extends PaginationDto {
     @ApiPropertyOptional({ description: 'ID de la catégorie' })
     @IsOptional()
     @Type(() => Number)

@@ -13,8 +13,8 @@ export class CommandesControleur {
     constructor(private readonly commandesService: CommandesService) { }
 
     @Post()
-    @Roles('client')
-    @ApiOperation({ summary: 'Créer une commande (client)' })
+    @Roles('client', 'administrateur')
+    @ApiOperation({ summary: 'Créer une commande' })
     async creer(
         @UtilisateurCourant('id') clientId: number,
         @Body() dto: CreerCommandeDto,
@@ -23,8 +23,8 @@ export class CommandesControleur {
     }
 
     @Get('mes-commandes')
-    @Roles('client')
-    @ApiOperation({ summary: 'Consulter mes commandes (client)' })
+    @Roles('client', 'administrateur')
+    @ApiOperation({ summary: 'Consulter mes commandes' })
     async mesCommandes(
         @UtilisateurCourant('id') clientId: number,
         @Query() dto: PaginationDto,
@@ -33,13 +33,14 @@ export class CommandesControleur {
     }
 
     @Get()
-    @Roles('administrateur', 'gestionnaire')
-    @ApiOperation({ summary: 'Lister toutes les commandes (admin/gestionnaire)' })
+    @Roles('administrateur')
+    @ApiOperation({ summary: 'Lister toutes les commandes (admin)' })
     async listerToutes(@Query() dto: PaginationDto) {
         return this.commandesService.listerToutes(dto);
     }
 
     @Get(':id')
+    @Roles('client', 'administrateur')
     @ApiOperation({ summary: 'Consulter une commande' })
     async trouverParId(
         @Param('id', ParseIntPipe) id: number,
@@ -50,8 +51,8 @@ export class CommandesControleur {
     }
 
     @Patch(':id/statut')
-    @Roles('administrateur', 'gestionnaire')
-    @ApiOperation({ summary: 'Changer le statut d\'une commande (admin/gestionnaire)' })
+    @Roles('administrateur')
+    @ApiOperation({ summary: 'Changer le statut d\'une commande (admin)' })
     async changerStatut(
         @Param('id', ParseIntPipe) id: number,
         @Body() dto: ChangerStatutCommandeDto,
@@ -61,6 +62,7 @@ export class CommandesControleur {
     }
 
     @Post(':id/annuler')
+    @Roles('client', 'administrateur')
     @ApiOperation({ summary: 'Annuler une commande' })
     async annuler(
         @Param('id', ParseIntPipe) id: number,
@@ -71,6 +73,7 @@ export class CommandesControleur {
     }
 
     @Get(':id/historique')
+    @Roles('administrateur')
     @ApiOperation({ summary: 'Historique des statuts d\'une commande' })
     async historique(@Param('id', ParseIntPipe) id: number) {
         return this.commandesService.historique(id);

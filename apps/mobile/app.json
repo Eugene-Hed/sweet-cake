@@ -7,10 +7,11 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "scheme": "sweet-cake",
+    "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#FFF0D4"
+      "backgroundColor": "#FFFFFF"
     },
     "ios": {
       "supportsTablet": true,
@@ -18,7 +19,9 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png",
         "backgroundColor": "#FFF0D4"
       },
       "package": "com.sweetcake.app"
@@ -30,7 +33,8 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-secure-store"
+      "expo-secure-store",
+      "@react-native-community/datetimepicker"
     ]
   }
 }

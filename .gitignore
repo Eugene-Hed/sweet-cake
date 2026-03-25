@@ -36,3 +36,17 @@ coverage/
 
 # Docker
 docker-data/
+
+# Uploads & Assets temporaires
+apps/api/uploads/
+apps/mobile/assets/logo.png
+catalogue.jpeg
+dump.rdb
+login_res.json
+migrate-roles.js
+
+# Expo
+.expo/
+dist/
+web-build/
+metro.config.js.copy

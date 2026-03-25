@@ -28,7 +28,7 @@ export class AteliersControleur {
 
     @Post()
     @ApiBearerAuth()
-    @Roles('administrateur', 'gestionnaire', 'formateur')
+    @Roles('administrateur')
     @ApiOperation({ summary: 'Créer un atelier' })
     async creer(@Body() dto: CreerAtelierDto, @UtilisateurCourant('id') createurId: number) {
         return this.ateliersService.creer(dto, createurId);
@@ -36,7 +36,7 @@ export class AteliersControleur {
 
     @Patch(':id')
     @ApiBearerAuth()
-    @Roles('administrateur', 'gestionnaire', 'formateur')
+    @Roles('administrateur')
     @ApiOperation({ summary: 'Modifier un atelier' })
     async mettreAJour(@Param('id', ParseIntPipe) id: number, @Body() dto: MettreAJourAtelierDto) {
         return this.ateliersService.mettreAJour(id, dto);

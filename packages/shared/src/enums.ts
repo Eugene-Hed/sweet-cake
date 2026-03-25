@@ -5,8 +5,6 @@
 export enum RoleUtilisateur {
     CLIENT = 'client',
     ADMINISTRATEUR = 'administrateur',
-    GESTIONNAIRE = 'gestionnaire',
-    FORMATEUR = 'formateur',
 }
 
 export enum StatutCommande {

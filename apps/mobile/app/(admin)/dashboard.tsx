@@ -1,24 +1,42 @@
 // =============================================================================
-// Sweet-Cake Mobile — Dashboard Admin
+// Sweet-Cake Mobile — Dashboard Admin (iOS 26 Next Gen)
 // =============================================================================
 
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, RefreshControl } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import {
+    View, Text, ScrollView, StyleSheet, RefreshControl,
+    Platform, TouchableOpacity, Animated, Dimensions
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { couleurs, espacements, typographie, rayons } from '@sweet-cake/shared';
 import api from '../../src/services/api';
 import { CarteStatistique } from '../../src/composants/Carte';
 import Badge, { BADGE_STATUT_COMMANDE } from '../../src/composants/Badge';
 import Chargement from '../../src/composants/Chargement';
+import GraphiqueLigne from '../../src/composants/GraphiqueLigne';
+import GraphiqueBarres from '../../src/composants/GraphiqueBarres';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function Dashboard() {
     const [resume, setResume] = useState<any>(null);
     const [chargement, setChargement] = useState(true);
     const [rafraichissant, setRafraichissant] = useState(false);
 
+    // Animation d'entrée
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+
     const charger = async () => {
         try {
             const { data } = await api.get('/tableau-de-bord/resume');
             setResume(data.donnees);
+
+            Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 800,
+                useNativeDriver: true,
+            }).start();
         } catch (err) {
             console.error('Erreur dashboard:', err);
         } finally {
@@ -31,9 +49,14 @@ export default function Dashboard() {
 
     if (chargement) return <Chargement />;
 
+    const aDesVentes = resume?.stats_hebdo?.length > 0;
+    const aDesCategories = resume?.stats_categories?.length > 0;
+
     return (
         <ScrollView
             style={styles.conteneur}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 100 }}
             refreshControl={
                 <RefreshControl
                     refreshing={rafraichissant}
@@ -42,86 +65,361 @@ export default function Dashboard() {
                 />
             }
         >
-            {/* Bannière */}
-            <View style={styles.banniere}>
-                <Text style={styles.banniereTitre}>🍰 Sweet-Cake Admin</Text>
-                <Text style={styles.banniereTexte}>Tableau de bord</Text>
-            </View>
-
-            {/* Stats */}
-            <View style={styles.statsGrille}>
-                <CarteStatistique titre="Commandes" valeur={resume?.total_commandes || 0} icone="📦" />
-                <CarteStatistique titre="Produits" valeur={resume?.total_produits || 0} icone="🍰" />
-                <CarteStatistique titre="Ateliers" valeur={resume?.total_ateliers || 0} icone="👩‍🍳" />
-                <CarteStatistique titre="Clients" valeur={resume?.total_clients || 0} icone="👥" />
-                <CarteStatistique
-                    titre="Revenus"
-                    valeur={`${(resume?.revenus_estimes || 0).toFixed(0)} €`}
-                    icone="💰"
-                />
-                <CarteStatistique
-                    titre="Alertes stock"
-                    valeur={resume?.alertes_stock_faible || 0}
-                    icone="⚠️"
-                />
-            </View>
-
-            {/* Commandes récentes */}
-            <View style={styles.section}>
-                <Text style={styles.sectionTitre}>Commandes récentes</Text>
-                {(resume?.commandes_recentes || []).slice(0, 5).map((c: any) => (
-                    <View key={c.id} style={styles.commandeCarte}>
-                        <View style={styles.commandeEntete}>
-                            <Text style={styles.commandeId}>#{c.id}</Text>
-                            <Badge
-                                texte={c.statut?.replace('_', ' ') || ''}
-                                variante={BADGE_STATUT_COMMANDE[c.statut] || 'neutre'}
-                            />
-                        </View>
-                        <Text style={styles.commandeClient}>{c.client?.nom_complet || 'Client'}</Text>
-                        <View style={styles.commandePied}>
-                            <Text style={styles.commandeDate}>
-                                {new Date(c.created_at).toLocaleDateString('fr-FR')}
-                            </Text>
-                            <Text style={styles.commandeTotal}>{Number(c.total).toFixed(2)} €</Text>
-                        </View>
+            {/* Header Futuriste (Glassmorphism) */}
+            <LinearGradient
+                colors={['#0f172a', '#1e293b']}
+                style={styles.header}
+            >
+                <View style={styles.headerTop}>
+                    <View>
+                        <Text style={styles.headerSalut}>TABLEAU DE BORD</Text>
+                        <Text style={styles.headerNom}>Sweet-Cake Admin</Text>
                     </View>
-                ))}
+                    <TouchableOpacity style={styles.profilBouton}>
+                        <LinearGradient
+                            colors={['#e9c46a', '#f4a261']}
+                            style={styles.avatar}
+                        >
+                            <Ionicons name="person" size={20} color="#fff" />
+                        </LinearGradient>
+                    </TouchableOpacity>
+                </View>
+
+                {/* Main Metric Card */}
+                <Animated.View style={[styles.mainMetric, { opacity: fadeAnim }]}>
+                    <View>
+                        <Text style={styles.metricLabel}>Chiffre d'affaires mensuel</Text>
+                        <Text style={styles.metricValeur}>
+                            {resume?.revenus_estimes > 0
+                                ? Number(resume.revenus_estimes).toLocaleString()
+                                : '0'} FCFA
+                        </Text>
+                    </View>
+                    {resume?.revenus_estimes > 0 && (
+                        <View style={styles.trendBadge}>
+                            <Ionicons name="trending-up" size={12} color="#2ecc71" />
+                            <Text style={styles.trendTexte}>+0%</Text>
+                        </View>
+                    )}
+                </Animated.View>
+
+                {/* Graphique de tendance (Ligne) */}
+                <View style={styles.chartContainer}>
+                    <Text style={styles.chartTitre}>Évolution des Ventes (7j)</Text>
+                    {aDesVentes ? (
+                        <GraphiqueLigne
+                            donnees={resume.stats_hebdo}
+                            hauteur={100}
+                            couleurLine="#e9c46a"
+                        />
+                    ) : (
+                        <View style={styles.chartVide}>
+                            <Text style={styles.chartVideTexte}>Aucune vente enregistrée cette semaine</Text>
+                        </View>
+                    )}
+                </View>
+            </LinearGradient>
+
+            {/* Quick Stats Grid */}
+            <View style={styles.statsGrille}>
+                <CarteStatistique
+                    titre="Commandes"
+                    valeur={resume?.total_commandes || 0}
+                    icone="📦"
+                    couleurIcone="#e76f51"
+                />
+                <CarteStatistique
+                    titre="Produits"
+                    valeur={resume?.total_produits || 0}
+                    icone="🍰"
+                    couleurIcone={couleurs.primaire.defaut}
+                />
+                <CarteStatistique
+                    titre="Ateliers"
+                    valeur={resume?.total_ateliers || 0}
+                    icone="👩‍🍳"
+                    couleurIcone="#e9c46a"
+                />
+                <CarteStatistique
+                    titre="Clients"
+                    valeur={resume?.total_clients || 0}
+                    icone="👥"
+                    couleurIcone="#264653"
+                />
             </View>
 
-            <View style={{ height: 40 }} />
+            {/* Section Graphique Barres - Répartition */}
+            <View style={styles.glassSection}>
+                <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionTitre}>Répartition par Catégorie</Text>
+                    <Ionicons name="pie-chart-outline" size={20} color={couleurs.gris[400]} />
+                </View>
+                {aDesCategories ? (
+                    <GraphiqueBarres donnees={resume.stats_categories} unite="Produits" />
+                ) : (
+                    <Text style={styles.videTexte}>Créez des catégories pour voir la répartition</Text>
+                )}
+            </View>
+
+            {/* Alertes Stock (si besoin) */}
+            {(resume?.alertes_stock_faible || 0) > 0 && (
+                <TouchableOpacity style={styles.alerteCard}>
+                    <LinearGradient
+                        colors={['#fee2e2', '#fecaca']}
+                        style={styles.alerteGradient}
+                    >
+                        <Ionicons name="warning" size={24} color="#dc2626" />
+                        <View style={{ flex: 1 }}>
+                            <Text style={styles.alerteTitre}>Alerte de Stock</Text>
+                            <Text style={styles.alerteDescription}>
+                                {resume.alertes_stock_faible} article(s) à réapprovisionner
+                            </Text>
+                        </View>
+                        <Ionicons name="chevron-forward" size={20} color="#dc2626" />
+                    </LinearGradient>
+                </TouchableOpacity>
+            )}
+
+            {/* Commandes Récentes */}
+            <View style={styles.sectionRecente}>
+                <View style={[styles.sectionHeader, { paddingHorizontal: 0 }]}>
+                    <Text style={styles.sectionTitre}>Dernières Activités</Text>
+                    <TouchableOpacity>
+                        <Text style={styles.voirTout}>Tout voir</Text>
+                    </TouchableOpacity>
+                </View>
+
+                {resume?.commandes_recentes?.length > 0 ? (
+                    resume.commandes_recentes.slice(0, 3).map((c: any) => (
+                        <View key={c.id} style={styles.activiteItem}>
+                            <View style={styles.activiteIcone}>
+                                <Ionicons name="cart" size={20} color={couleurs.primaire.defaut} />
+                            </View>
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.activiteTitre}>{c.client?.nom_complet || 'Nouvelle commande'}</Text>
+                                <Text style={styles.activiteHeure}>
+                                    {new Date(c.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                                </Text>
+                            </View>
+                            <Text style={styles.activiteMontant}>+{Number(c.montant_total || 0).toLocaleString()} F</Text>
+                        </View>
+                    ))
+                ) : (
+                    <View style={styles.videContainer}>
+                        <Ionicons name="sparkles-outline" size={48} color={couleurs.gris[300]} />
+                        <Text style={styles.videTexte}>En attente de vos premières ventes...</Text>
+                    </View>
+                )}
+            </View>
         </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
-    conteneur: { flex: 1, backgroundColor: couleurs.gris[50] },
-    banniere: {
-        backgroundColor: couleurs.gris[900],
-        padding: espacements.lg,
-        paddingTop: espacements.xl,
-        paddingBottom: espacements['2xl'],
+    conteneur: { flex: 1, backgroundColor: '#f8fafc' },
+    header: {
+        padding: 24,
+        paddingTop: 60,
+        borderBottomLeftRadius: 32,
+        borderBottomRightRadius: 32,
+        gap: 24,
     },
-    banniereTitre: { fontSize: typographie.titre_secondaire.taille, fontWeight: '700', color: couleurs.blanc },
-    banniereTexte: { fontSize: typographie.texte_secondaire.taille, color: couleurs.gris[400], marginTop: 4 },
+    headerTop: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    headerSalut: {
+        fontSize: 12,
+        fontWeight: '800',
+        color: '#e9c46a',
+        letterSpacing: 2,
+    },
+    headerNom: {
+        fontSize: 24,
+        fontWeight: '800',
+        color: '#fff',
+        marginTop: 4,
+    },
+    profilBouton: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        overflow: 'hidden',
+        borderWidth: 2,
+        borderColor: 'rgba(255,255,255,0.2)',
+    },
+    avatar: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    mainMetric: {
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderRadius: 24,
+        padding: 24,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.15)',
+    },
+    metricLabel: {
+        fontSize: 14,
+        color: 'rgba(255,255,255,0.6)',
+        fontWeight: '600',
+    },
+    metricValeur: {
+        fontSize: 28,
+        fontWeight: '800',
+        color: '#fff',
+        marginTop: 4,
+    },
+    trendBadge: {
+        backgroundColor: 'rgba(46, 204, 113, 0.2)',
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    trendTexte: {
+        color: '#2ecc71',
+        fontSize: 12,
+        fontWeight: '700',
+    },
+    chartContainer: {
+        marginTop: 10,
+    },
+    chartTitre: {
+        fontSize: 14,
+        color: 'rgba(255,255,255,0.8)',
+        fontWeight: '700',
+        marginBottom: 10,
+    },
     statsGrille: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
-        padding: espacements.md,
-        marginTop: -espacements.lg,
+        paddingHorizontal: 16,
+        marginTop: -30,
     },
-    section: { paddingHorizontal: espacements.md, marginTop: espacements.md },
-    sectionTitre: { fontSize: typographie.texte_corps.taille, fontWeight: '700', color: couleurs.gris[900], marginBottom: espacements.md },
-    commandeCarte: {
-        backgroundColor: couleurs.blanc, borderRadius: rayons.md,
-        padding: espacements.md_sm, marginBottom: espacements.sm,
-        borderWidth: 1, borderColor: couleurs.gris[200],
+    glassSection: {
+        backgroundColor: '#fff',
+        marginHorizontal: 16,
+        marginTop: 24,
+        borderRadius: 24,
+        padding: 20,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.05,
+                shadowRadius: 10,
+            },
+            android: { elevation: 3 },
+        }),
     },
-    commandeEntete: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    commandeId: { fontSize: typographie.texte_corps.taille, fontWeight: '700', color: couleurs.gris[900] },
-    commandeClient: { fontSize: typographie.texte_secondaire.taille, color: couleurs.gris[600], marginTop: 4 },
-    commandePied: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 },
-    commandeDate: { fontSize: typographie.legende.taille, color: couleurs.gris[400] },
-    commandeTotal: { fontSize: typographie.texte_corps.taille, fontWeight: '700', color: couleurs.primaire.defaut },
+    sectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    sectionTitre: {
+        fontSize: 18,
+        fontWeight: '800',
+        color: '#0f172a',
+    },
+    alerteCard: {
+        marginHorizontal: 16,
+        marginTop: 16,
+        borderRadius: 20,
+        overflow: 'hidden',
+    },
+    alerteGradient: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 16,
+        gap: 12,
+    },
+    alerteTitre: {
+        fontSize: 15,
+        fontWeight: '700',
+        color: '#991b1b',
+    },
+    alerteDescription: {
+        fontSize: 13,
+        color: '#b91c1c',
+        marginTop: 2,
+    },
+    sectionRecente: {
+        paddingHorizontal: 16,
+        marginTop: 24,
+    },
+    voirTout: {
+        fontSize: 14,
+        color: couleurs.secondaire.defaut,
+        fontWeight: '700',
+    },
+    activiteItem: {
+        backgroundColor: '#fff',
+        borderRadius: 20,
+        padding: 16,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 16,
+        marginBottom: 12,
+    },
+    activiteIcone: {
+        width: 44,
+        height: 44,
+        borderRadius: 14,
+        backgroundColor: 'rgba(107, 73, 58, 0.08)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    activiteTitre: {
+        fontSize: 15,
+        fontWeight: '700',
+        color: '#1e293b',
+    },
+    activiteHeure: {
+        fontSize: 12,
+        color: '#64748b',
+        marginTop: 2,
+    },
+    activiteMontant: {
+        fontSize: 16,
+        fontWeight: '800',
+        color: '#2ecc71',
+    },
+    videContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 40,
+        gap: 12,
+    },
+    videTexte: {
+        fontSize: 14,
+        color: '#94a3b8',
+        fontWeight: '600',
+        textAlign: 'center',
+    },
+    chartVide: {
+        height: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        borderRadius: 16,
+        borderWidth: 1,
+        borderStyle: 'dashed',
+        borderColor: 'rgba(255,255,255,0.2)',
+    },
+    chartVideTexte: {
+        color: 'rgba(255,255,255,0.4)',
+        fontSize: 12,
+        fontWeight: '600',
+    }
 });

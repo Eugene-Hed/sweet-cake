@@ -6,7 +6,7 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { ReponseApi } from '@sweet-cake/shared';
 
-const BASE_URL = 'http://localhost:3000/api/v1';
+const BASE_URL = 'http://172.20.10.2:3000/api/v1';
 
 export const CLES_STOCKAGE = {
     JETON_ACCES: 'jeton_acces',

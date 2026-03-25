@@ -56,9 +56,7 @@ export const useAuthStore = create<EtatAuth>((set, get) => ({
             await SecureStore.setItemAsync(CLES_STOCKAGE.JETON_ACCES, jeton_acces);
             await SecureStore.setItemAsync(CLES_STOCKAGE.JETON_RAFRAICHISSEMENT, jeton_rafraichissement);
 
-            const estAdmin = [RoleUtilisateur.ADMINISTRATEUR, RoleUtilisateur.GESTIONNAIRE].includes(
-                utilisateur.role as RoleUtilisateur,
-            );
+            const estAdmin = utilisateur.role === RoleUtilisateur.ADMINISTRATEUR;
 
             set({
                 utilisateur,
@@ -108,9 +106,7 @@ export const useAuthStore = create<EtatAuth>((set, get) => ({
         try {
             const { data } = await api.get('/authentification/profil');
             const utilisateur = data.donnees;
-            const estAdmin = [RoleUtilisateur.ADMINISTRATEUR, RoleUtilisateur.GESTIONNAIRE].includes(
-                utilisateur.role as RoleUtilisateur,
-            );
+            const estAdmin = utilisateur.role === RoleUtilisateur.ADMINISTRATEUR;
             set({ utilisateur, estAdmin });
         } catch { /* session expirée */ }
     },
@@ -123,9 +119,7 @@ export const useAuthStore = create<EtatAuth>((set, get) => ({
         try {
             const { data } = await api.get('/authentification/profil');
             const utilisateur = data.donnees;
-            const estAdmin = [RoleUtilisateur.ADMINISTRATEUR, RoleUtilisateur.GESTIONNAIRE].includes(
-                utilisateur.role as RoleUtilisateur,
-            );
+            const estAdmin = utilisateur.role === RoleUtilisateur.ADMINISTRATEUR;
             set({ utilisateur, estConnecte: true, estAdmin, estChargement: false });
         } catch {
             await SecureStore.deleteItemAsync(CLES_STOCKAGE.JETON_ACCES);

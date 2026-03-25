@@ -45,8 +45,6 @@ model utilisateurs {
 enum RoleUtilisateur {
   client
   administrateur
-  gestionnaire
-  formateur
 }
 
 // =============================================================================

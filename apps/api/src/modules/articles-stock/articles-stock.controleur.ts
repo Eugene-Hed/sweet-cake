@@ -13,28 +13,28 @@ export class ArticlesStockControleur {
     constructor(private readonly articlesStockService: ArticlesStockService) { }
 
     @Get('articles-stock')
-    @Roles('administrateur', 'gestionnaire')
+    @Roles('administrateur')
     @ApiOperation({ summary: 'Lister les articles de stock' })
     async listerTous(@Query() dto: PaginationDto) {
         return this.articlesStockService.listerTous(dto);
     }
 
     @Get('articles-stock/:id')
-    @Roles('administrateur', 'gestionnaire')
+    @Roles('administrateur')
     @ApiOperation({ summary: 'Consulter un article de stock' })
     async trouverParId(@Param('id', ParseIntPipe) id: number) {
         return this.articlesStockService.trouverParId(id);
     }
 
     @Post('articles-stock')
-    @Roles('administrateur', 'gestionnaire')
+    @Roles('administrateur')
     @ApiOperation({ summary: 'Créer un article de stock' })
     async creer(@Body() dto: CreerArticleStockDto) {
         return this.articlesStockService.creer(dto);
     }
 
     @Patch('articles-stock/:id')
-    @Roles('administrateur', 'gestionnaire')
+    @Roles('administrateur')
     @ApiOperation({ summary: 'Modifier un article de stock' })
     async mettreAJour(@Param('id', ParseIntPipe) id: number, @Body() dto: MettreAJourArticleStockDto) {
         return this.articlesStockService.mettreAJour(id, dto);
@@ -48,7 +48,7 @@ export class ArticlesStockControleur {
     }
 
     @Post('articles-stock/:id/mouvements')
-    @Roles('administrateur', 'gestionnaire')
+    @Roles('administrateur')
     @ApiOperation({ summary: 'Enregistrer un mouvement de stock' })
     async creerMouvement(
         @Param('id', ParseIntPipe) id: number,
@@ -59,7 +59,7 @@ export class ArticlesStockControleur {
     }
 
     @Get('alertes-stock')
-    @Roles('administrateur', 'gestionnaire')
+    @Roles('administrateur')
     @ApiOperation({ summary: 'Alertes de stock faible' })
     async alertesStockFaible() {
         return this.articlesStockService.alertesStockFaible();

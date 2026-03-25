@@ -13,8 +13,8 @@ export class ReservationsAtelierControleur {
     constructor(private readonly reservationsService: ReservationsAtelierService) { }
 
     @Post('ateliers/:id/reservations')
-    @Roles('client')
-    @ApiOperation({ summary: 'Réserver un atelier (client)' })
+    @Roles('client', 'administrateur')
+    @ApiOperation({ summary: 'Réserver un atelier' })
     async reserver(
         @Param('id', ParseIntPipe) atelierId: number,
         @UtilisateurCourant('id') clientId: number,
@@ -24,8 +24,8 @@ export class ReservationsAtelierControleur {
     }
 
     @Get('reservations/mes-reservations')
-    @Roles('client')
-    @ApiOperation({ summary: 'Mes réservations (client)' })
+    @Roles('client', 'administrateur')
+    @ApiOperation({ summary: 'Mes réservations' })
     async mesReservations(
         @UtilisateurCourant('id') clientId: number,
         @Query() dto: PaginationDto,
@@ -34,7 +34,7 @@ export class ReservationsAtelierControleur {
     }
 
     @Get('reservations')
-    @Roles('administrateur', 'gestionnaire', 'formateur')
+    @Roles('administrateur')
     @ApiOperation({ summary: 'Lister toutes les réservations' })
     async listerToutes(@Query() dto: PaginationDto) {
         return this.reservationsService.listerToutes(dto);

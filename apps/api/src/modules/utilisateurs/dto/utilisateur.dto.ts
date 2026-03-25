@@ -25,7 +25,7 @@ export class ChangerStatutUtilisateurDto {
 }
 
 export class ChangerRoleUtilisateurDto {
-    @ApiPropertyOptional({ description: 'Nouveau rôle', enum: ['client', 'administrateur', 'gestionnaire', 'formateur'] })
-    @IsIn(['client', 'administrateur', 'gestionnaire', 'formateur'])
+    @ApiPropertyOptional({ description: 'Nouveau rôle', enum: ['client', 'administrateur'] })
+    @IsIn(['client', 'administrateur'])
     role: string;
 }

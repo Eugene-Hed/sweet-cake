@@ -3,7 +3,8 @@
 // =============================================================================
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { couleurs, espacements, typographie, rayons } from '@sweet-cake/shared';
 import api from '../../src/services/api';
@@ -44,8 +45,6 @@ export default function PlusAdmin() {
 
     const ROLES_COULEURS: Record<string, string> = {
         administrateur: 'primaire',
-        gestionnaire: 'information',
-        formateur: 'avertissement',
         client: 'neutre',
     };
 
@@ -61,6 +60,39 @@ export default function PlusAdmin() {
                 <View>
                     <Text style={styles.nom}>{utilisateur?.nom_complet}</Text>
                     <Text style={styles.email}>{utilisateur?.email}</Text>
+                </View>
+            </View>
+
+            {/* Actions Administrateur */}
+            <View style={styles.section}>
+                <Text style={styles.sectionTitre}>🛠️ Gestion & Inventaire</Text>
+                <View style={styles.actionsGrille}>
+                    <TouchableOpacity style={styles.actionCarte} onPress={() => router.push('/(admin)/catalogue/produits')}>
+                        <View style={[styles.actionIcone, { backgroundColor: couleurs.primaire.clair + '20' }]}>
+                            <Ionicons name="cafe" size={24} color={couleurs.primaire.defaut} />
+                        </View>
+                        <Text style={styles.actionTexte}>Produits</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.actionCarte} onPress={() => router.push('/(admin)/catalogue/categories')}>
+                        <View style={[styles.actionIcone, { backgroundColor: couleurs.secondaire.clair + '40' }]}>
+                            <Ionicons name="apps" size={24} color={couleurs.secondaire.fonce} />
+                        </View>
+                        <Text style={styles.actionTexte}>Catégories</Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={[styles.actionsGrille, { marginTop: 12 }]}>
+                    <TouchableOpacity style={styles.actionCarte} onPress={() => router.push('/(admin)/ateliers-admin')}>
+                        <View style={[styles.actionIcone, { backgroundColor: '#e0f2fe' }]}>
+                            <Ionicons name="school" size={24} color="#0369a1" />
+                        </View>
+                        <Text style={styles.actionTexte}>Ateliers</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.actionCarte} onPress={() => router.push('/(admin)/stock')}>
+                        <View style={[styles.actionIcone, { backgroundColor: '#fef3c7' }]}>
+                            <Ionicons name="cube" size={24} color="#b45309" />
+                        </View>
+                        <Text style={styles.actionTexte}>Stock</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
 
@@ -122,6 +154,29 @@ const styles = StyleSheet.create({
     email: { fontSize: typographie.texte_secondaire.taille, color: couleurs.gris[400] },
     section: { padding: espacements.md },
     sectionTitre: { fontSize: typographie.texte_corps.taille, fontWeight: '700', color: couleurs.gris[900], marginBottom: espacements.md },
+    actionsGrille: { flexDirection: 'row', gap: 12 },
+    actionCarte: {
+        flex: 1,
+        backgroundColor: couleurs.blanc,
+        borderRadius: 16,
+        padding: 16,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: couleurs.gris[200],
+        ...Platform.select({
+            ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 6 },
+            android: { elevation: 2 },
+        }),
+    },
+    actionIcone: {
+        width: 48,
+        height: 48,
+        borderRadius: 14,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    actionTexte: { fontSize: 13, fontWeight: '700', color: couleurs.gris[800] },
     userLigne: {
         flexDirection: 'row', alignItems: 'center',
         backgroundColor: couleurs.blanc, borderRadius: rayons.md,

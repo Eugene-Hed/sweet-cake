@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD, APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 // Modules communs
 import { PrismaModule } from './commun/prisma/prisma.module';
@@ -58,6 +60,12 @@ import { SanteModule } from './modules/sante/sante.module';
         TableauDeBordModule,
         JournauxAuditModule,
         SanteModule,
+
+        // Fichiers statiques (Uploads)
+        ServeStaticModule.forRoot({
+            rootPath: join(__dirname, '..', 'uploads'),
+            serveRoot: '/uploads',
+        }),
     ],
     providers: [
         // Garde JWT globale

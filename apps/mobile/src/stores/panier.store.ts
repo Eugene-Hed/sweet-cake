@@ -14,7 +14,7 @@ interface ArticlePanier {
 
 interface EtatPanier {
     articles: ArticlePanier[];
-    ajouter: (article: Omit<ArticlePanier, 'quantite'>) => void;
+    ajouter: (article: Omit<ArticlePanier, 'quantite'>, quantite?: number) => void;
     retirer: (produit_id: number) => void;
     modifierQuantite: (produit_id: number, quantite: number) => void;
     vider: () => void;
@@ -25,19 +25,19 @@ interface EtatPanier {
 export const usePanierStore = create<EtatPanier>((set, get) => ({
     articles: [],
 
-    ajouter: (article) => {
+    ajouter: (article, quantite = 1) => {
         set((state) => {
             const existant = state.articles.find((a) => a.produit_id === article.produit_id);
             if (existant) {
                 return {
                     articles: state.articles.map((a) =>
                         a.produit_id === article.produit_id
-                            ? { ...a, quantite: a.quantite + 1 }
+                            ? { ...a, quantite: a.quantite + quantite }
                             : a,
                     ),
                 };
             }
-            return { articles: [...state.articles, { ...article, quantite: 1 }] };
+            return { articles: [...state.articles, { ...article, quantite }] };
         });
     },
 

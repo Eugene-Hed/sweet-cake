@@ -1,9 +1,10 @@
 // =============================================================================
-// Sweet-Cake Mobile — Composant Carte
+// Sweet-Cake Mobile — Composant Carte (Design Premium)
 // =============================================================================
 
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ViewStyle } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ViewStyle, Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { couleurs, rayons, espacements, typographie, ombres } from '@sweet-cake/shared';
 
 interface CarteProps {
@@ -17,8 +18,8 @@ export default function Carte({ children, onPress, style }: CarteProps) {
     return (
         <Composant
             onPress={onPress}
-            activeOpacity={onPress ? 0.7 : 1}
-            style={[styles.carte, ombres.sm.rn, style]}
+            activeOpacity={onPress ? 0.85 : 1}
+            style={[styles.carte, style]}
         >
             {children}
         </Composant>
@@ -46,11 +47,21 @@ export function CarteProduit({ nom, prix, image_url, categorie, onPress }: Carte
                         <Text style={styles.imagePlaceholderTexte}>🍰</Text>
                     </View>
                 )}
+                {/* Badge catégorie */}
+                {categorie && (
+                    <View style={styles.categorieBadge}>
+                        <Text style={styles.categorieBadgeTexte}>{categorie}</Text>
+                    </View>
+                )}
             </View>
             <View style={styles.produitInfo}>
-                {categorie && <Text style={styles.categorie}>{categorie}</Text>}
                 <Text style={styles.produitNom} numberOfLines={1}>{nom}</Text>
-                <Text style={styles.produitPrix}>{prix.toFixed(2)} €</Text>
+                <View style={styles.prixLigne}>
+                    <Text style={styles.produitPrix}>{prix.toLocaleString()} FCFA</Text>
+                    <View style={styles.ajouterBtn}>
+                        <Ionicons name="add" size={16} color={couleurs.blanc} />
+                    </View>
+                </View>
             </View>
         </Carte>
     );
@@ -68,7 +79,9 @@ interface CarteStatistiqueProps {
 export function CarteStatistique({ titre, valeur, icone, couleurIcone }: CarteStatistiqueProps) {
     return (
         <Carte style={styles.carteStat}>
-            <Text style={styles.statIcone}>{icone}</Text>
+            <View style={[styles.statIconeWrapper, { backgroundColor: (couleurIcone || couleurs.primaire.defaut) + '15' }]}>
+                <Text style={styles.statIcone}>{icone}</Text>
+            </View>
             <Text style={styles.statValeur}>{valeur}</Text>
             <Text style={styles.statTitre}>{titre}</Text>
         </Carte>
@@ -78,21 +91,27 @@ export function CarteStatistique({ titre, valeur, icone, couleurIcone }: CarteSt
 const styles = StyleSheet.create({
     carte: {
         backgroundColor: couleurs.blanc,
-        borderRadius: rayons.lg,
-        padding: espacements.md,
-        borderWidth: 1,
-        borderColor: couleurs.gris[200],
+        borderRadius: 16,
+        ...Platform.select({
+            ios: {
+                shadowColor: couleurs.noir,
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.06,
+                shadowRadius: 8,
+            },
+            android: { elevation: 3 },
+        }),
     },
     // Carte produit
     carteProduit: {
-        padding: 0,
         overflow: 'hidden',
         width: '48%',
         marginBottom: espacements.md,
     },
     imageConteneur: {
         width: '100%',
-        height: 120,
+        height: 130,
+        position: 'relative',
     },
     image: {
         width: '100%',
@@ -107,25 +126,47 @@ const styles = StyleSheet.create({
     imagePlaceholderTexte: {
         fontSize: 40,
     },
-    produitInfo: {
-        padding: espacements.md_sm,
+    categorieBadge: {
+        position: 'absolute',
+        top: 8,
+        left: 8,
+        backgroundColor: 'rgba(255,255,255,0.92)',
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        borderRadius: 8,
     },
-    categorie: {
-        fontSize: typographie.legende.taille,
-        color: couleurs.primaire.defaut,
-        fontWeight: '600',
-        marginBottom: 2,
-    },
-    produitNom: {
-        fontSize: typographie.texte_secondaire.taille,
-        fontWeight: '600',
-        color: couleurs.gris[900],
-        marginBottom: 4,
-    },
-    produitPrix: {
-        fontSize: typographie.texte_corps.taille,
+    categorieBadgeTexte: {
+        fontSize: 10,
         fontWeight: '700',
         color: couleurs.primaire.defaut,
+        letterSpacing: 0.3,
+    },
+    produitInfo: {
+        padding: 12,
+    },
+    produitNom: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: couleurs.gris[900],
+        marginBottom: 6,
+    },
+    prixLigne: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    produitPrix: {
+        fontSize: 15,
+        fontWeight: '800',
+        color: couleurs.primaire.defaut,
+    },
+    ajouterBtn: {
+        width: 26,
+        height: 26,
+        borderRadius: 13,
+        backgroundColor: couleurs.primaire.defaut,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     // Carte statistique
     carteStat: {
@@ -133,19 +174,28 @@ const styles = StyleSheet.create({
         width: '48%',
         marginBottom: espacements.md,
         paddingVertical: espacements.lg,
+        paddingHorizontal: espacements.md,
+    },
+    statIconeWrapper: {
+        width: 48,
+        height: 48,
+        borderRadius: 14,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 10,
     },
     statIcone: {
-        fontSize: 28,
-        marginBottom: espacements.sm,
+        fontSize: 24,
     },
     statValeur: {
-        fontSize: typographie.titre_secondaire.taille,
-        fontWeight: '700',
+        fontSize: 22,
+        fontWeight: '800',
         color: couleurs.gris[900],
     },
     statTitre: {
-        fontSize: typographie.legende.taille,
+        fontSize: 12,
         color: couleurs.gris[500],
         marginTop: 4,
+        fontWeight: '500',
     },
 });

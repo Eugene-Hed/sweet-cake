@@ -27,7 +27,7 @@ export class CategoriesControleur {
 
     @Post()
     @ApiBearerAuth()
-    @Roles('administrateur', 'gestionnaire')
+    @Roles('administrateur')
     @ApiOperation({ summary: 'Créer une catégorie' })
     async creer(@Body() dto: CreerCategorieDto) {
         return this.categoriesService.creer(dto);
@@ -35,7 +35,7 @@ export class CategoriesControleur {
 
     @Patch(':id')
     @ApiBearerAuth()
-    @Roles('administrateur', 'gestionnaire')
+    @Roles('administrateur')
     @ApiOperation({ summary: 'Modifier une catégorie' })
     async mettreAJour(@Param('id', ParseIntPipe) id: number, @Body() dto: MettreAJourCategorieDto) {
         return this.categoriesService.mettreAJour(id, dto);

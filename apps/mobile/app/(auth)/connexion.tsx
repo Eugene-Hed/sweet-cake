@@ -1,9 +1,11 @@
 // =============================================================================
-// Sweet-Cake Mobile — Écran Connexion
+// Sweet-Cake Mobile — Écran Connexion (Design Premium)
 // =============================================================================
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { couleurs, espacements, typographie } from '@sweet-cake/shared';
 import ChampSaisie from '../../src/composants/ChampSaisie';
@@ -26,10 +28,23 @@ export default function Connexion() {
     return (
         <KeyboardAvoidingView style={styles.conteneur} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+                {/* Fond décoratif */}
+                <LinearGradient
+                    colors={[couleurs.primaire.clair + '30', couleurs.secondaire.clair + '50', 'transparent']}
+                    style={styles.fondDecoratif}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                />
+
                 {/* Logo / Marque */}
                 <View style={styles.entete}>
-                    <Text style={styles.logo}>🍰</Text>
-                    <Text style={styles.titre}>Sweet-Cake</Text>
+                    <View style={styles.logoConteneur}>
+                        <Image
+                            source={require('../../assets/logo.png')}
+                            style={styles.logoImage}
+                            resizeMode="contain"
+                        />
+                    </View>
                     <Text style={styles.sousTitre}>Connectez-vous à votre compte</Text>
                 </View>
 
@@ -37,6 +52,7 @@ export default function Connexion() {
                 <View style={styles.formulaire}>
                     {erreur && (
                         <View style={styles.erreurBox}>
+                            <Ionicons name="alert-circle" size={18} color={couleurs.erreur.fonce} />
                             <Text style={styles.erreurTexte}>{erreur}</Text>
                         </View>
                     )}
@@ -49,6 +65,7 @@ export default function Connexion() {
                         keyboardType="email-address"
                         autoCapitalize="none"
                         autoComplete="email"
+                        iconeGauche={<Ionicons name="mail-outline" size={20} color={couleurs.gris[400]} />}
                     />
 
                     <ChampSaisie
@@ -58,6 +75,7 @@ export default function Connexion() {
                         onChangeText={(text) => { setMotDePasse(text); effacerErreur(); }}
                         secureTextEntry
                         autoComplete="password"
+                        iconeGauche={<Ionicons name="lock-closed-outline" size={20} color={couleurs.gris[400]} />}
                     />
 
                     <Bouton
@@ -65,17 +83,29 @@ export default function Connexion() {
                         onPress={handleConnexion}
                         chargement={estChargement}
                         pleineLargeur
+                        taille="lg"
                         desactive={!email || !motDePasse}
                     />
+
+                    <View style={styles.separateur}>
+                        <View style={styles.separateurLigne} />
+                        <Text style={styles.separateurTexte}>ou</Text>
+                        <View style={styles.separateurLigne} />
+                    </View>
 
                     <Bouton
                         titre="Créer un compte"
                         onPress={() => router.push('/(auth)/inscription')}
-                        variante="fantome"
+                        variante="secondaire"
                         pleineLargeur
-                        style={{ marginTop: espacements.md }}
+                        taille="lg"
                     />
                 </View>
+
+                {/* Footer */}
+                <Text style={styles.footer}>
+                    📍 Awae escalier — Mfou  •  📞 692 042 589
+                </Text>
             </ScrollView>
         </KeyboardAvoidingView>
     );
@@ -84,45 +114,87 @@ export default function Connexion() {
 const styles = StyleSheet.create({
     conteneur: {
         flex: 1,
-        backgroundColor: couleurs.gris[50],
+        backgroundColor: couleurs.blanc,
     },
     scroll: {
         flexGrow: 1,
         justifyContent: 'center',
-        padding: espacements.lg,
+        padding: 24,
+    },
+    fondDecoratif: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: 300,
+        borderBottomLeftRadius: 60,
+        borderBottomRightRadius: 60,
     },
     entete: {
         alignItems: 'center',
-        marginBottom: espacements['3xl'],
+        marginBottom: 32,
     },
-    logo: {
-        fontSize: 64,
-        marginBottom: espacements.md,
+    logoConteneur: {
+        marginBottom: 12,
     },
-    titre: {
-        fontSize: typographie.titre_principal.taille,
-        fontWeight: '700',
-        color: couleurs.primaire.defaut,
+    logoImage: {
+        width: 200,
+        height: 160,
     },
     sousTitre: {
-        fontSize: typographie.texte_secondaire.taille,
+        fontSize: 15,
         color: couleurs.gris[500],
-        marginTop: espacements.xs,
+        fontWeight: '500',
     },
     formulaire: {
         backgroundColor: couleurs.blanc,
-        borderRadius: 16,
-        padding: espacements.lg,
+        borderRadius: 24,
+        padding: 24,
+        ...Platform.select({
+            ios: {
+                shadowColor: couleurs.noir,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.08,
+                shadowRadius: 16,
+            },
+            android: { elevation: 6 },
+        }),
     },
     erreurBox: {
         backgroundColor: couleurs.erreur.clair,
-        padding: espacements.md_sm,
-        borderRadius: 8,
-        marginBottom: espacements.md,
+        padding: 12,
+        borderRadius: 12,
+        marginBottom: 16,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
     },
     erreurTexte: {
         color: couleurs.erreur.fonce,
-        fontSize: typographie.texte_secondaire.taille,
+        fontSize: 13,
+        fontWeight: '500',
+        flex: 1,
+    },
+    separateur: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 20,
+    },
+    separateurLigne: {
+        flex: 1,
+        height: 1,
+        backgroundColor: couleurs.gris[200],
+    },
+    separateurTexte: {
+        marginHorizontal: 16,
+        color: couleurs.gris[400],
+        fontSize: 13,
+        fontWeight: '500',
+    },
+    footer: {
         textAlign: 'center',
+        marginTop: 24,
+        fontSize: 12,
+        color: couleurs.gris[400],
     },
 });

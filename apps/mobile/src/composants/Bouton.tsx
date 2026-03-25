@@ -1,9 +1,10 @@
 // =============================================================================
-// Sweet-Cake Mobile — Composant Bouton
+// Sweet-Cake Mobile — Composant Bouton (Design Premium)
 // =============================================================================
 
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle, Platform } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { couleurs, rayons, espacements, typographie } from '@sweet-cake/shared';
 
 type VarianteBouton = 'primaire' | 'secondaire' | 'danger' | 'fantome';
@@ -18,32 +19,38 @@ interface BoutonProps {
     chargement?: boolean;
     pleineLargeur?: boolean;
     style?: ViewStyle;
+    icone?: React.ReactNode;
 }
 
 const CONFIGS_VARIANTES = {
     primaire: {
-        fond: couleurs.primaire.defaut,
+        gradient: [couleurs.primaire.defaut, couleurs.primaire.fonce] as const,
         texte: couleurs.blanc,
         bordure: 'transparent',
+        ombre: couleurs.primaire.defaut,
     },
     secondaire: {
-        fond: 'transparent',
+        gradient: null,
         texte: couleurs.primaire.defaut,
-        bordure: couleurs.primaire.defaut,
+        bordure: couleurs.primaire.clair,
+        ombre: 'transparent',
     },
     danger: {
-        fond: couleurs.erreur.defaut,
+        gradient: [couleurs.erreur.defaut, couleurs.erreur.fonce] as const,
         texte: couleurs.blanc,
         bordure: 'transparent',
+        ombre: couleurs.erreur.defaut,
     },
     fantome: {
-        fond: 'transparent',
-        texte: couleurs.gris[700],
+        gradient: null,
+        texte: couleurs.gris[600],
         bordure: 'transparent',
+        ombre: 'transparent',
     },
 };
 
-const HAUTEURS: Record<TailleBouton, number> = { sm: 36, md: 44, lg: 52 };
+const HAUTEURS: Record<TailleBouton, number> = { sm: 40, md: 50, lg: 56 };
+const FONT_SIZES: Record<TailleBouton, number> = { sm: 13, md: 15, lg: 17 };
 
 export default function Bouton({
     titre,
@@ -54,47 +61,116 @@ export default function Bouton({
     chargement = false,
     pleineLargeur = false,
     style,
+    icone,
 }: BoutonProps) {
     const config = CONFIGS_VARIANTES[variante];
+    const hauteur = HAUTEURS[taille];
+
+    const contenu = (
+        <>
+            {chargement ? (
+                <ActivityIndicator color={config.texte} size="small" />
+            ) : (
+                <>
+                    {icone}
+                    <Text
+                        style={[
+                            styles.texte,
+                            { color: config.texte, fontSize: FONT_SIZES[taille] },
+                            icone ? { marginLeft: 8 } : undefined,
+                        ]}
+                    >
+                        {titre}
+                    </Text>
+                </>
+            )}
+        </>
+    );
+
+    const boutonStyle = [
+        styles.base,
+        {
+            height: hauteur,
+            borderColor: config.bordure,
+            borderWidth: variante === 'secondaire' ? 1.5 : 0,
+            opacity: desactive ? 0.5 : 1,
+            ...(!config.gradient && { backgroundColor: variante === 'secondaire' ? couleurs.primaire.clair + '20' : 'transparent' }),
+        },
+        config.gradient && config.ombre !== 'transparent' && Platform.select({
+            ios: {
+                shadowColor: config.ombre,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+            },
+            android: { elevation: 4 },
+        }),
+        pleineLargeur && styles.pleineLargeur,
+        style,
+    ];
+
+    if (config.gradient) {
+        return (
+            <TouchableOpacity
+                onPress={onPress}
+                disabled={desactive || chargement}
+                activeOpacity={0.8}
+                style={[pleineLargeur && styles.pleineLargeur, style]}
+            >
+                <LinearGradient
+                    colors={[...config.gradient]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={[
+                        styles.base,
+                        styles.gradient,
+                        {
+                            height: hauteur,
+                            opacity: desactive ? 0.5 : 1,
+                        },
+                        config.ombre !== 'transparent' && Platform.select({
+                            ios: {
+                                shadowColor: config.ombre,
+                                shadowOffset: { width: 0, height: 4 },
+                                shadowOpacity: 0.3,
+                                shadowRadius: 8,
+                            },
+                            android: { elevation: 4 },
+                        }),
+                    ]}
+                >
+                    {contenu}
+                </LinearGradient>
+            </TouchableOpacity>
+        );
+    }
 
     return (
         <TouchableOpacity
             onPress={onPress}
             disabled={desactive || chargement}
             activeOpacity={0.7}
-            style={[
-                styles.base,
-                {
-                    backgroundColor: config.fond,
-                    borderColor: config.bordure,
-                    borderWidth: variante === 'secondaire' ? 1.5 : 0,
-                    height: HAUTEURS[taille],
-                    opacity: desactive ? 0.5 : 1,
-                },
-                pleineLargeur && styles.pleineLargeur,
-                style,
-            ]}
+            style={boutonStyle}
         >
-            {chargement ? (
-                <ActivityIndicator color={config.texte} size="small" />
-            ) : (
-                <Text style={[styles.texte, { color: config.texte }]}>{titre}</Text>
-            )}
+            {contenu}
         </TouchableOpacity>
     );
 }
 
 const styles = StyleSheet.create({
     base: {
-        borderRadius: rayons.md,
+        borderRadius: 14,
         paddingHorizontal: espacements.lg,
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
     },
+    gradient: {
+        borderRadius: 14,
+    },
     texte: {
-        fontSize: typographie.texte_bouton.taille,
-        fontWeight: '600',
+        fontWeight: '700',
+        letterSpacing: 0.3,
     },
     pleineLargeur: {
         width: '100%',

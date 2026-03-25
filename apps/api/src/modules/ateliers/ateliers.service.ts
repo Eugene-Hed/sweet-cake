@@ -20,7 +20,13 @@ export class AteliersService {
         const [ateliers, total] = await Promise.all([
             this.prisma.ateliers.findMany({
                 where, skip, take, orderBy,
-                include: { createur: { select: { id: true, nom_complet: true } } },
+                include: {
+                    createur: { select: { id: true, nom_complet: true } },
+                    reservations_atelier: {
+                        where: { statut: { not: 'annulee' } },
+                        include: { client: { select: { id: true, nom_complet: true } } },
+                    },
+                },
             }),
             this.prisma.ateliers.count({ where }),
         ]);

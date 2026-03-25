@@ -131,8 +131,8 @@ Mot de passe pour tous : `MotDePasse1`
 | Rôle | Email |
 |---|---|
 | Administrateur | `admin@sweet-cake.fr` |
-| Gestionnaire | `sophie@sweet-cake.fr` |
-| Formateur | `pierre@sweet-cake.fr` |
+| Administrateur | `sophie@sweet-cake.fr` |
+| Administrateur | `paul@sweet-cake.fr` |
 | Client 1 | `marie@example.com` |
 | Client 2 | `jean@example.com` |
 
@@ -181,10 +181,8 @@ Consultez la documentation Swagger complète à `/api/docs`.
 
 | Rôle | Accès |
 |---|---|
-| `client` | Inscription, commandes, réservations, profil |
-| `gestionnaire` | Gestion produits, commandes, stock, ateliers |
-| `formateur` | Gestion ateliers |
-| `administrateur` | Accès complet + gestion utilisateurs |
+| `client` | Produits, commandes, réservations, profil |
+| `administrateur` | Gestion complète (Catalogue, Stock, Commandes, Utilisateurs, Audits) |
 
 ## Scripts npm
 

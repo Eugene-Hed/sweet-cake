@@ -24,7 +24,7 @@ export class InscriptionDto {
     })
     mot_de_passe: string;
 
-    @ApiPropertyOptional({ description: 'Numéro de téléphone', example: '+33612345678' })
+    @ApiPropertyOptional({ description: 'Numéro de téléphone', example: '+237612345678' })
     @IsOptional()
     @IsString()
     @MaxLength(20)

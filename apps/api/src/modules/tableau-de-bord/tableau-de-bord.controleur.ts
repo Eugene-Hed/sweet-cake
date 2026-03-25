@@ -10,7 +10,7 @@ export class TableauDeBordControleur {
     constructor(private readonly tableauDeBordService: TableauDeBordService) { }
 
     @Get('resume')
-    @Roles('administrateur', 'gestionnaire')
+    @Roles('administrateur')
     @ApiOperation({ summary: 'Résumé du tableau de bord' })
     async resume() {
         return this.tableauDeBordService.resume();
