@@ -35,12 +35,49 @@ sweet-cake/
 │       ├── tableau-de-bord/   # Résumé administrateur
 │       ├── journaux-audit/    # Audit des actions sensibles
 │       └── sante/             # Health / readiness checks
-├── packages/shared/           # Types et constantes partagés
+├── packages/shared/           # Types, constantes et design system partagés
+│   └── src/design/            # 🎨 Design tokens (couleurs, typo, thèmes...)
 ├── prisma/                    # Schéma, migrations, seed
 ├── docs/                      # Documentation technique
 ├── .github/workflows/         # CI/CD GitHub Actions
 └── docker-compose.yml         # Services locaux (api, mysql, redis)
 ```
+
+## 🎨 Design System
+
+Le design system est centralisé dans `packages/shared/src/design/` et garantit une **identité visuelle cohérente** entre l'app mobile et le back-office.
+
+### Utilisation
+
+```typescript
+import {
+    couleurs, typographie, espacements, rayons, ombres,
+    theme_clair, theme_sombre,
+    styles_boutons, styles_cartes,
+} from '@sweet-cake/shared';
+
+// Couleur primaire
+const rose = couleurs.primaire.defaut;      // '#E8608A'
+
+// Thème courant
+const fond = theme_clair.couleurs.fond;     // '#FAFAFA'
+
+// Typographie
+const titre = typographie.titre_principal;  // { taille: 32, ... }
+```
+
+### Tokens disponibles
+
+| Fichier | Contenu |
+|---|---|
+| `couleurs.ts` | Palette (primaire, secondaire, accent, sémantiques, neutres) |
+| `typographie.ts` | Police Inter, 7 niveaux typographiques |
+| `espacements.ts` | Échelle 4px (xs → 5xl) |
+| `rayons.ts` | Border-radius (aucun → complet) |
+| `ombres.ts` | Ombres CSS + React Native |
+| `tailles.ts` | Icônes, boutons, champs, avatars |
+| `themes.ts` | Thème clair (défaut) + thème sombre |
+| `composants.ts` | Specs boutons, champs, cartes, badges, alertes |
 
 ## Démarrage rapide
 
