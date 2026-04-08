@@ -1,0 +1,192 @@
+/* =============================================================================
+ * Page Connexion — Styles
+ * ============================================================================= */
+
+.connexion-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--espace-lg);
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1A1A2E 0%, #2D1B3D 50%, #1A1A2E 100%);
+}
+
+.connexion-fond {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.connexion-forme {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+}
+
+.connexion-forme--1 {
+  width: 500px;
+  height: 500px;
+  background: var(--couleur-primaire);
+  top: -150px;
+  right: -100px;
+  animation: floatShape1 8s ease-in-out infinite;
+}
+
+.connexion-forme--2 {
+  width: 400px;
+  height: 400px;
+  background: var(--couleur-secondaire);
+  bottom: -100px;
+  left: -80px;
+  animation: floatShape2 10s ease-in-out infinite;
+}
+
+.connexion-forme--3 {
+  width: 300px;
+  height: 300px;
+  background: var(--couleur-accent);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: floatShape3 12s ease-in-out infinite;
+}
+
+@keyframes floatShape1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-30px, 40px) scale(1.1); }
+}
+
+@keyframes floatShape2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, -30px) scale(1.05); }
+}
+
+@keyframes floatShape3 {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.15); }
+}
+
+.connexion-carte {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--rayon-xl);
+  padding: var(--espace-2xl);
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.3);
+  animation: scaleIn 500ms ease-out;
+}
+
+.connexion-entete {
+  text-align: center;
+  margin-bottom: var(--espace-xl);
+}
+
+.connexion-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, var(--couleur-primaire), var(--couleur-accent));
+  color: white;
+  border-radius: var(--rayon-xl);
+  margin-bottom: var(--espace-md);
+  box-shadow: 0 8px 24px rgba(232, 96, 138, 0.3);
+}
+
+.connexion-titre {
+  font-size: var(--taille-titre-secondaire);
+  font-weight: var(--poids-gras);
+  color: #FFFFFF;
+  margin-bottom: var(--espace-xs);
+}
+
+.connexion-sous-titre {
+  font-size: var(--taille-texte-secondaire);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.connexion-formulaire {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-md-lg);
+}
+
+.connexion-formulaire .champ-label {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.connexion-formulaire .champ-saisie {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+}
+
+.connexion-formulaire .champ-saisie::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.connexion-formulaire .champ-saisie:focus {
+  border-color: var(--couleur-primaire);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.connexion-champ-icone {
+  position: relative;
+}
+
+.connexion-icone {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+}
+
+.connexion-toggle-mdp {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: color var(--transition-rapide);
+}
+
+.connexion-toggle-mdp:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.connexion-formulaire .alerte {
+  background: rgba(220, 53, 69, 0.15);
+  border-color: var(--couleur-erreur);
+  color: #F8D7DA;
+}
+
+.connexion-formulaire .bouton--primaire {
+  margin-top: var(--espace-sm);
+  background: linear-gradient(135deg, var(--couleur-primaire), var(--couleur-accent));
+  border: none;
+  font-size: var(--taille-texte-corps);
+  font-weight: var(--poids-semi-gras);
+  letter-spacing: 0.3px;
+  box-shadow: 0 8px 24px rgba(232, 96, 138, 0.25);
+  transition: all var(--transition-normale);
+}
+
+.connexion-formulaire .bouton--primaire:hover:not(:disabled) {
+  box-shadow: 0 12px 32px rgba(232, 96, 138, 0.4);
+  transform: translateY(-2px);
+}

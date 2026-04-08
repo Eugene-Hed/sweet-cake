@@ -1,0 +1,13 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+.env
+.dockerignore
+**/node_modules
+**/dist
+**/build
+apps/mobile/android
+apps/mobile/ios
+.expo
+.next

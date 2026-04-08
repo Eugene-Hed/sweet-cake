@@ -1,0 +1,159 @@
+/* =============================================================================
+ * Sweet-Cake Back-Office — Styles globaux
+ * ============================================================================= */
+
+@import './variables.css';
+
+/* --- Reset --- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--police-principale);
+  font-size: var(--taille-texte-corps);
+  font-weight: var(--poids-normal);
+  line-height: 1.5;
+  color: var(--couleur-texte-principal);
+  background-color: var(--couleur-fond);
+  transition: background-color var(--transition-normale), color var(--transition-normale);
+}
+
+a {
+  color: var(--couleur-primaire);
+  text-decoration: none;
+  transition: color var(--transition-rapide);
+}
+
+a:hover {
+  color: var(--couleur-primaire-fonce);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input, textarea, select {
+  font-family: inherit;
+}
+
+/* --- Typographie utilitaire --- */
+.titre-principal {
+  font-size: var(--taille-titre-principal);
+  font-weight: var(--poids-gras);
+  line-height: 1.25;
+  color: var(--couleur-texte-principal);
+}
+
+.titre-secondaire {
+  font-size: var(--taille-titre-secondaire);
+  font-weight: var(--poids-semi-gras);
+  line-height: 1.33;
+  color: var(--couleur-texte-principal);
+}
+
+.sous-titre {
+  font-size: var(--taille-sous-titre);
+  font-weight: var(--poids-semi-gras);
+  line-height: 1.4;
+  color: var(--couleur-texte-principal);
+}
+
+.texte-corps {
+  font-size: var(--taille-texte-corps);
+  font-weight: var(--poids-normal);
+  line-height: 1.5;
+}
+
+.texte-secondaire {
+  font-size: var(--taille-texte-secondaire);
+  font-weight: var(--poids-normal);
+  line-height: 1.43;
+  color: var(--couleur-texte-secondaire);
+}
+
+.legende {
+  font-size: var(--taille-legende);
+  font-weight: var(--poids-normal);
+  line-height: 1.33;
+  color: var(--couleur-texte-secondaire);
+}
+
+/* --- Scrollbar personnalisée --- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gris-300);
+  border-radius: var(--rayon-complet);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gris-400);
+}
+
+/* --- Selection --- */
+::selection {
+  background-color: var(--couleur-primaire-clair);
+  color: var(--couleur-primaire-fonce);
+}
+
+/* --- Animation keyframes --- */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animer-fondu {
+  animation: fadeIn var(--transition-normale) ease-out;
+}
+
+.animer-glissement {
+  animation: slideInUp var(--transition-normale) ease-out;
+}

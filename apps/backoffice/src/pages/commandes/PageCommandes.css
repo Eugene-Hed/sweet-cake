@@ -1,0 +1,16 @@
+.commande-detail-grille {
+  display: grid;
+  gap: var(--espace-lg);
+}
+
+.commande-info-grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--espace-md);
+}
+
+.tableau tfoot td {
+  padding: var(--espace-md-sm) var(--espace-md);
+  border-top: 2px solid var(--couleur-bordure);
+  background: var(--couleur-fond-secondaire);
+}

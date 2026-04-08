@@ -10,8 +10,9 @@
   "scripts": {
     "dev": "npm run dev --workspace=apps/api",
     "dev:api": "npm run dev --workspace=apps/api",
-    "dev:mobile": "EXPO_OFFLINE=1 npm run start --workspace=apps/mobile -- --offline",
-    "dev:all": "npx concurrently \"npm run dev:api\" \"npm run dev:mobile\"",
+    "dev:backoffice": "npm run dev --workspace=apps/backoffice",
+    "dev:mobile": "npm run start --workspace=apps/mobile",
+    "dev:all": "npx concurrently \"npm run dev:api\" \"npm run dev:backoffice\"",
     "build": "npm run build --workspace=apps/api",
     "start": "npm run start --workspace=apps/api",
     "start:prod": "npm run start:prod --workspace=apps/api",
@@ -40,6 +41,7 @@
   "author": "",
   "license": "UNLICENSED",
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0"
   }
 }

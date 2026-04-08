@@ -1,0 +1,23 @@
+.dashboard-grille-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--espace-md);
+  margin-bottom: var(--espace-xl);
+}
+
+.dashboard-section {
+  margin-bottom: var(--espace-xl);
+}
+
+.dashboard-section-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--espace-md);
+}
+
+@media (max-width: 640px) {
+  .dashboard-grille-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
