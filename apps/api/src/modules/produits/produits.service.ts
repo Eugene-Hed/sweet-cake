@@ -37,7 +37,10 @@ export class ProduitsService {
                 skip,
                 take,
                 orderBy,
-                include: { categorie: { select: { id: true, nom: true } } },
+                include: { 
+                    categorie: { select: { id: true, nom: true } },
+                    options_produit: true
+                },
             }),
             this.prisma.produits.count({ where }),
         ]);
@@ -48,26 +51,57 @@ export class ProduitsService {
     async trouverParId(id: number) {
         const produit = await this.prisma.produits.findFirst({
             where: { id, deleted_at: null },
-            include: { categorie: { select: { id: true, nom: true } } },
+            include: { 
+                categorie: { select: { id: true, nom: true } },
+                options_produit: true
+            },
         });
         if (!produit) throw new NotFoundException('Produit non trouvé');
         return { message: 'Produit récupéré', donnees: produit };
     }
 
     async creer(dto: CreerProduitDto) {
+        const { options, ...donneesProduit } = dto;
         const produit = await this.prisma.produits.create({
-            data: dto,
-            include: { categorie: { select: { id: true, nom: true } } },
+            data: {
+                ...donneesProduit,
+                options_produit: options ? {
+                    create: options.map(o => ({
+                        nom: o.nom,
+                        valeurs: o.valeurs,
+                        est_obligatoire: o.est_obligatoire ?? false
+                    }))
+                } : undefined
+            },
+            include: { 
+                categorie: { select: { id: true, nom: true } },
+                options_produit: true
+            },
         });
         return { message: 'Produit créé', donnees: produit };
     }
 
     async mettreAJour(id: number, dto: MettreAJourProduitDto) {
         await this.trouverParId(id);
+        const { options, ...donneesProduit } = dto;
+        
         const produit = await this.prisma.produits.update({
             where: { id },
-            data: dto,
-            include: { categorie: { select: { id: true, nom: true } } },
+            data: {
+                ...donneesProduit as any,
+                options_produit: options ? {
+                    deleteMany: {},
+                    create: options.map(o => ({
+                        nom: o.nom,
+                        valeurs: o.valeurs,
+                        est_obligatoire: o.est_obligatoire ?? false
+                    }))
+                } : undefined
+            },
+            include: { 
+                categorie: { select: { id: true, nom: true } },
+                options_produit: true
+            },
         });
         return { message: 'Produit mis à jour', donnees: produit };
     }

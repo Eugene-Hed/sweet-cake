@@ -63,39 +63,60 @@ export default function StockAdmin() {
     if (chargement) return <Chargement />;
 
     return (
-        <ScrollView
-            style={styles.conteneur}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 120 }}
-            refreshControl={
-                <RefreshControl
-                    refreshing={false}
-                    onRefresh={charger}
-                    tintColor={couleurs.secondaire.defaut}
-                />
-            }
-        >
-            {/* Bannière Alerte (Style iOS 26) */}
-            {alertes.length > 0 && (
-                <View style={styles.alerteSection}>
-                    <LinearGradient
-                        colors={['#fee2e2', '#fecaca']}
-                        style={styles.alerteBanniere}
-                    >
-                        <View style={styles.alerteEntete}>
-                            <Ionicons name="warning" size={24} color="#dc2626" />
-                            <Text style={styles.alerteTitre}>Stock Critique ({alertes.length})</Text>
-                        </View>
-                        <View style={styles.alerteListe}>
-                            {alertes.slice(0, 3).map((a: any) => (
-                                <Text key={a.id} style={styles.alerteTexte}>
-                                    📦 {a.nom} : <Text style={{ fontWeight: '800' }}>{a.quantite}</Text> {a.unite}
-                                </Text>
-                            ))}
-                        </View>
-                    </LinearGradient>
+        <View style={styles.conteneur}>
+            <LinearGradient
+                colors={['#0f172a', '#1e293b']}
+                style={styles.header}
+            >
+                <Text style={styles.headerTitre}>GESTION DES STOCKS</Text>
+                <View style={styles.headerStats}>
+                    <View style={styles.headerStatItem}>
+                        <Text style={styles.headerStatValeur}>{alertes.length}</Text>
+                        <Text style={styles.headerStatLabel}>Critiques</Text>
+                    </View>
+                    <View style={styles.headerStatDivider} />
+                    <View style={styles.headerStatItem}>
+                        <Text style={styles.headerStatValeur}>{articles.length}</Text>
+                        <Text style={styles.headerStatLabel}>Articles</Text>
+                    </View>
                 </View>
-            )}
+            </LinearGradient>
+
+            <ScrollView
+                style={styles.scroll}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 150 }}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={false}
+                        onRefresh={charger}
+                        tintColor="#e9c46a"
+                    />
+                }
+            >
+                {/* Bannière Alerte Premium */}
+                {alertes.length > 0 && (
+                    <View style={styles.alerteSection}>
+                        <View style={styles.alertePremium}>
+                            <View style={styles.alerteEntete}>
+                                <View style={styles.warningIconBox}>
+                                    <Ionicons name="warning" size={20} color="#fff" />
+                                </View>
+                                <Text style={styles.alerteTitre}>Réapprovisionnement requis</Text>
+                            </View>
+                            <View style={styles.alerteListe}>
+                                {alertes.slice(0, 3).map((a: any) => (
+                                    <View key={a.id} style={styles.alerteItem}>
+                                        <View style={styles.alerteDot} />
+                                        <Text style={styles.alerteTexte}>
+                                            {a.nom} (<Text style={{ fontWeight: '800' }}>{Number(a.quantite)}</Text>)
+                                        </Text>
+                                    </View>
+                                ))}
+                            </View>
+                        </View>
+                    </View>
+                )}
 
             <View style={styles.padding}>
                 <View style={styles.sectionHeader}>
@@ -205,23 +226,64 @@ export default function StockAdmin() {
                     <Ionicons name="add" size={32} color={couleurs.blanc} />
                 </LinearGradient>
             </TouchableOpacity>
-        </ScrollView>
+            </ScrollView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
     conteneur: { flex: 1, backgroundColor: '#f8fafc' },
-    padding: { padding: 16 },
-    alerteSection: { padding: 16, paddingBottom: 0 },
-    alerteBanniere: {
-        borderRadius: 24,
-        padding: 20,
-        gap: 12,
+    header: {
+        padding: 24,
+        paddingTop: 20,
+        backgroundColor: '#0f172a',
+        borderBottomLeftRadius: 28,
+        borderBottomRightRadius: 28,
     },
-    alerteEntete: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-    alerteTitre: { fontSize: 16, fontWeight: '800', color: '#991b1b' },
-    alerteListe: { gap: 6 },
-    alerteTexte: { fontSize: 13, color: '#b91c1c', fontWeight: '500' },
+    headerTitre: {
+        fontSize: 12,
+        fontWeight: '800',
+        color: '#e9c46a',
+        letterSpacing: 2,
+        marginBottom: 16,
+    },
+    headerStats: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 24,
+    },
+    headerStatItem: { gap: 2 },
+    headerStatValeur: { fontSize: 24, fontWeight: '900', color: '#fff' },
+    headerStatLabel: { fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: '600' },
+    headerStatDivider: { width: 1, height: 24, backgroundColor: 'rgba(255,255,255,0.1)' },
+    scroll: { flex: 1 },
+    padding: { padding: 16 },
+    alerteSection: { paddingHorizontal: 16, marginTop: 16 },
+    alertePremium: {
+        backgroundColor: '#fff',
+        borderRadius: 24,
+        padding: 16,
+        borderLeftWidth: 6,
+        borderLeftColor: '#ef4444',
+        ...Platform.select({
+            ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 10 },
+            android: { elevation: 2 },
+        }),
+    },
+    alerteEntete: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
+    warningIconBox: {
+        width: 32,
+        height: 32,
+        borderRadius: 10,
+        backgroundColor: '#ef4444',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    alerteTitre: { fontSize: 15, fontWeight: '700', color: '#0f172a' },
+    alerteListe: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+    alerteItem: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#fef2f2', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
+    alerteDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: '#ef4444' },
+    alerteTexte: { fontSize: 12, color: '#ef4444', fontWeight: '600' },
     sectionHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -229,33 +291,36 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         marginTop: 8
     },
-    sectionTitre: { fontSize: 18, fontWeight: '800', color: '#0f172a' },
+    sectionTitre: { fontSize: 17, fontWeight: '800', color: '#0f172a' },
     statsText: { fontSize: 13, color: '#64748b', fontWeight: '600' },
     carteGlass: {
         backgroundColor: '#fff',
-        borderRadius: 24,
-        padding: 16,
+        borderRadius: 28,
+        padding: 20,
         marginBottom: 12,
         borderWidth: 1,
         borderColor: '#f1f5f9',
         ...Platform.select({
-            ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.03, shadowRadius: 8 },
+            ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.03, shadowRadius: 10 },
             android: { elevation: 2 },
         }),
     },
     carteOuverte: {
-        borderColor: couleurs.secondaire.defaut,
+        borderColor: '#e9c46a',
         borderWidth: 1.5,
+        backgroundColor: '#fff',
     },
     carteContenu: { flexDirection: 'row', alignItems: 'center', gap: 14 },
     iconeBox: {
         width: 44, height: 44, borderRadius: 14,
         backgroundColor: '#f8fafc',
         justifyContent: 'center', alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#f1f5f9',
     },
     nom: { fontSize: 16, fontWeight: '700', color: '#1e293b' },
     unite: { fontSize: 12, color: '#94a3b8', marginTop: 2, fontWeight: '500' },
-    quantiteBox: { alignItems: 'flex-end', gap: 4 },
+    quantiteBox: { flexDirection: 'row', alignItems: 'center', gap: 12 },
     quantiteValeur: { fontSize: 22, fontWeight: '900', color: '#0f172a' },
     mouvementPanel: {
         marginTop: 16,
@@ -291,18 +356,18 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 100,
         right: 24,
-        width: 64,
-        height: 64,
-        borderRadius: 32,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
         ...Platform.select({
-            ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.3, shadowRadius: 12 },
-            android: { elevation: 8 },
+            ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.2, shadowRadius: 10 },
+            android: { elevation: 6 },
         }),
     },
     fabGradient: {
         width: '100%',
         height: '100%',
-        borderRadius: 32,
+        borderRadius: 30,
         justifyContent: 'center',
         alignItems: 'center',
     },

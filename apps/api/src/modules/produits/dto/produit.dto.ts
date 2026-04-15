@@ -1,7 +1,30 @@
-import { IsNotEmpty, IsString, IsNumber, IsOptional, IsBoolean, IsInt, MaxLength, Min } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsOptional, IsBoolean, IsInt, MaxLength, Min, IsArray, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PaginationDto } from '../../../commun/dto/pagination.dto';
+
+export class OptionProduitDto {
+    @ApiPropertyOptional({ description: 'ID de l\'option (pour mise à jour)', example: 1 })
+    @IsOptional()
+    @IsInt()
+    id?: number;
+
+    @ApiProperty({ description: 'Nom de l\'option', example: 'Parfum' })
+    @IsNotEmpty()
+    @IsString()
+    @MaxLength(255)
+    nom: string;
+
+    @ApiProperty({ description: 'Valeurs possibles (séparées par des virgules)', example: 'Chocolat, Vanille, Fraise' })
+    @IsNotEmpty()
+    @IsString()
+    valeurs: string;
+
+    @ApiPropertyOptional({ description: 'Est obligatoire', example: false })
+    @IsOptional()
+    @IsBoolean()
+    est_obligatoire?: boolean;
+}
 
 export class CreerProduitDto {
     @ApiProperty({ description: 'ID de la catégorie', example: 1 })
@@ -42,6 +65,13 @@ export class CreerProduitDto {
     @IsOptional()
     @IsBoolean()
     est_actif?: boolean;
+
+    @ApiPropertyOptional({ description: 'Options de personnalisation', type: [OptionProduitDto] })
+    @IsOptional()
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => OptionProduitDto)
+    options?: OptionProduitDto[];
 }
 
 export class MettreAJourProduitDto {
@@ -82,6 +112,13 @@ export class MettreAJourProduitDto {
     @IsOptional()
     @IsBoolean()
     est_actif?: boolean;
+
+    @ApiPropertyOptional({ description: 'Options de personnalisation', type: [OptionProduitDto] })
+    @IsOptional()
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => OptionProduitDto)
+    options?: OptionProduitDto[];
 }
 
 export class FiltreProduitsDto extends PaginationDto {

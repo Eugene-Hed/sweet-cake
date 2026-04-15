@@ -13,6 +13,10 @@ export class LigneCommandeDto {
     @IsInt()
     @Min(1)
     quantite: number;
+
+    @ApiPropertyOptional({ description: 'Options choisies', example: { Parfum: 'Chocolat' } })
+    @IsOptional()
+    options_choisies?: Record<string, string>;
 }
 
 export class CreerCommandeDto {

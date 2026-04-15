@@ -31,7 +31,7 @@ export default function Ateliers() {
 
     const reserver = async (atelierId: number) => {
         try {
-            await api.post('/reservations', { atelier_id: atelierId });
+            await api.post(`/ateliers/${atelierId}/reservations`, { nombre_places: 1 });
             Alert.alert('✅ Réservé !', 'Votre place a été réservée avec succès.');
             charger();
         } catch (err: any) {

@@ -69,10 +69,11 @@ export class CommandesService {
                 const sousTotal = produit.prix.mul(ligne.quantite);
                 montantTotal = montantTotal.add(sousTotal);
                 return {
-                    produit_id: ligne.produit_id,
+                    produit: { connect: { id: ligne.produit_id } },
                     quantite: ligne.quantite,
                     prix_unitaire: produit.prix,
                     sous_total: sousTotal,
+                    options_choisies: (ligne.options_choisies || null) as any
                 };
             });
 

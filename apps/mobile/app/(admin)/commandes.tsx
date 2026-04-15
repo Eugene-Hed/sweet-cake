@@ -5,7 +5,7 @@
 import React, { useEffect, useState } from 'react';
 import {
     View, Text, ScrollView, StyleSheet, RefreshControl,
-    Platform, TouchableOpacity, Dimensions
+    Platform, TouchableOpacity, Dimensions, Linking
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -46,20 +46,49 @@ export default function CommandesAdmin() {
 
     if (chargement) return <Chargement />;
 
-    return (
-        <ScrollView
-            style={styles.conteneur}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 120 }}
-            refreshControl={
-                <RefreshControl
-                    refreshing={rafraichissant}
-                    onRefresh={() => { setRafraichissant(true); charger(); }}
-                    tintColor={couleurs.secondaire.defaut}
-                />
+    const contacterClient = (tel: string, message: string) => {
+        const url = `whatsapp://send?phone=${tel}&text=${encodeURIComponent(message)}`;
+        Linking.canOpenURL(url).then(supported => {
+            if (supported) {
+                Linking.openURL(url);
+            } else {
+                Linking.openURL(`tel:${tel}`);
             }
-        >
-            <View style={styles.padding}>
+        });
+    };
+
+    return (
+        <View style={styles.conteneur}>
+            <LinearGradient
+                colors={['#0f172a', '#1e293b']}
+                style={styles.header}
+            >
+                <Text style={styles.headerTitre}>GESTION DES VENTES</Text>
+                <View style={styles.headerStats}>
+                    <View style={styles.headerStatItem}>
+                        <Text style={styles.headerStatValeur}>{commandes.filter(c => c.statut === 'en_attente').length}</Text>
+                        <Text style={styles.headerStatLabel}>À confirmer</Text>
+                    </View>
+                    <View style={styles.headerStatDivider} />
+                    <View style={styles.headerStatItem}>
+                        <Text style={styles.headerStatValeur}>{commandes.length}</Text>
+                        <Text style={styles.headerStatLabel}>Total (20j)</Text>
+                    </View>
+                </View>
+            </LinearGradient>
+
+            <ScrollView
+                style={styles.scroll}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ padding: 16, paddingBottom: 150 }}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={rafraichissant}
+                        onRefresh={() => { setRafraichissant(true); charger(); }}
+                        tintColor="#e9c46a"
+                    />
+                }
+            >
                 {commandes.length > 0 ? (
                     commandes.map((c) => (
                         <View key={c.id} style={styles.carteGlass}>
@@ -93,20 +122,35 @@ export default function CommandesAdmin() {
                                         <Text style={styles.produitTexte} numberOfLines={1}>
                                             <Text style={styles.quantite}>{l.quantite}x</Text> {l.produit?.nom}
                                         </Text>
+                                        {l.options_choisies && Object.entries(l.options_choisies).length > 0 && (
+                                            <Text style={styles.optionTexte}>
+                                                {Object.entries(l.options_choisies).map(([k, v]) => `${k}: ${v}`).join(' • ')}
+                                            </Text>
+                                        )}
                                     </View>
                                 ))}
                             </View>
 
                             <View style={styles.pied}>
                                 <View>
-                                    <Text style={styles.totalLabel}>Total TTC</Text>
-                                    <Text style={styles.total}>{Number(c.montant_total).toLocaleString()} FCFA</Text>
+                                    <Text style={styles.totalLabel}>Montant Total</Text>
+                                    <View style={styles.totalRow}>
+                                        <Text style={styles.total}>{Number(c.montant_total).toLocaleString()} </Text>
+                                        <Text style={styles.devise}>FCFA</Text>
+                                    </View>
                                 </View>
 
                                 <View style={styles.actions}>
+                                    <TouchableOpacity 
+                                        style={styles.contactBtn}
+                                        onPress={() => contacterClient(c.client?.telephone, `Bonjour ${c.client?.nom_complet}, concernant votre commande #${c.id} chez Sweet-Cake...`)}
+                                    >
+                                        <Ionicons name="logo-whatsapp" size={18} color="#2ecc71" />
+                                    </TouchableOpacity>
+
                                     {c.statut === 'en_attente' && (
                                         <TouchableOpacity onPress={() => changerStatut(c.id, 'confirmee')}>
-                                            <LinearGradient colors={['#27ae60', '#2ecc71']} style={styles.actionBtn}>
+                                            <LinearGradient colors={['#b59a5d', '#8e7943']} style={styles.actionBtn}>
                                                 <Ionicons name="checkmark" size={20} color="#fff" />
                                             </LinearGradient>
                                         </TouchableOpacity>
@@ -135,62 +179,120 @@ export default function CommandesAdmin() {
                         <Text style={styles.videTexte}>Aucune commande pour le moment</Text>
                     </View>
                 )}
-            </View>
-        </ScrollView>
+            </ScrollView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
     conteneur: { flex: 1, backgroundColor: '#f8fafc' },
-    padding: { padding: 16 },
+    header: {
+        padding: 24,
+        paddingTop: 20,
+        backgroundColor: '#0f172a',
+        borderBottomLeftRadius: 28,
+        borderBottomRightRadius: 28,
+    },
+    headerTitre: {
+        fontSize: 12,
+        fontWeight: '800',
+        color: '#e9c46a',
+        letterSpacing: 2,
+        marginBottom: 16,
+    },
+    headerStats: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 24,
+    },
+    headerStatItem: {
+        gap: 2,
+    },
+    headerStatValeur: {
+        fontSize: 24,
+        fontWeight: '900',
+        color: '#fff',
+    },
+    headerStatLabel: {
+        fontSize: 11,
+        color: 'rgba(255,255,255,0.5)',
+        fontWeight: '600',
+    },
+    headerStatDivider: {
+        width: 1,
+        height: 24,
+        backgroundColor: 'rgba(255,255,255,0.1)',
+    },
+    scroll: { flex: 1 },
     carteGlass: {
         backgroundColor: '#ffffff',
-        borderRadius: 24,
-        padding: 20,
+        borderRadius: 28,
+        padding: 24,
         marginBottom: 16,
         borderWidth: 1,
         borderColor: '#f1f5f9',
         ...Platform.select({
-            ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 12 },
+            ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.04, shadowRadius: 16 },
             android: { elevation: 3 },
         }),
     },
-    entete: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
-    id: { fontSize: 16, fontWeight: '800', color: '#0f172a' },
-    date: { fontSize: 13, color: '#64748b', marginTop: 2 },
-    clientInfo: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 16 },
-    avatarMini: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        backgroundColor: '#f1f5f9',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    avatarTexte: { fontSize: 14, fontWeight: '700', color: couleurs.primaire.defaut },
-    clientNom: { fontSize: 15, fontWeight: '700', color: '#1e293b' },
-    clientTel: { fontSize: 12, color: '#94a3b8' },
-    produitsSection: {
-        backgroundColor: '#f8fafc',
+    entete: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 },
+    id: { fontSize: 17, fontWeight: '800', color: '#0f172a' },
+    date: { fontSize: 13, color: '#64748b', marginTop: 4, fontWeight: '500' },
+    clientInfo: { 
+        flexDirection: 'row', 
+        alignItems: 'center', 
+        gap: 14, 
+        marginBottom: 20,
+        backgroundColor: 'rgba(107, 73, 58, 0.03)',
         padding: 12,
         borderRadius: 16,
-        marginBottom: 16,
     },
-    produitLigne: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
-    puce: { width: 4, height: 4, borderRadius: 2, backgroundColor: couleurs.primaire.defaut },
-    produitTexte: { fontSize: 13, color: '#475569', flex: 1 },
+    avatarMini: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#e2e8f0',
+    },
+    avatarTexte: { fontSize: 15, fontWeight: '800', color: couleurs.primaire.defaut },
+    clientNom: { fontSize: 16, fontWeight: '700', color: '#1e293b' },
+    clientTel: { fontSize: 13, color: '#94a3b8', marginTop: 2 },
+    produitsSection: {
+        backgroundColor: '#fff',
+        padding: 4,
+        borderRadius: 16,
+        marginBottom: 20,
+    },
+    produitLigne: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
+    puce: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#e9c46a' },
+    produitTexte: { fontSize: 14, color: '#475569', flex: 1, fontWeight: '500' },
     quantite: { fontWeight: '800', color: '#1e293b' },
+    optionTexte: { fontSize: 11, color: '#64748b', marginLeft: 16, marginTop: -4, marginBottom: 4, fontWeight: '500' },
     pied: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         borderTopWidth: 1,
         borderTopColor: '#f1f5f9',
-        paddingTop: 16
+        paddingTop: 20
     },
-    totalLabel: { fontSize: 11, fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 },
-    total: { fontSize: 20, fontWeight: '900', color: couleurs.primaire.defaut, marginTop: 2 },
-    actions: { flexDirection: 'row', gap: 10 },
+    totalLabel: { fontSize: 11, fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1 },
+    totalRow: { flexDirection: 'row', alignItems: 'baseline', marginTop: 4 },
+    total: { fontSize: 22, fontWeight: '900', color: couleurs.primaire.defaut },
+    devise: { fontSize: 12, fontWeight: '800', color: couleurs.primaire.defaut },
+    actions: { flexDirection: 'row', gap: 12, alignItems: 'center' },
+    contactBtn: {
+        width: 44,
+        height: 44,
+        borderRadius: 14,
+        backgroundColor: 'rgba(46, 204, 113, 0.1)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     actionBtn: { width: 44, height: 44, borderRadius: 14, justifyContent: 'center', alignItems: 'center' },
     vide: { alignItems: 'center', justifyContent: 'center', padding: 100, gap: 16 },
     videTexte: { fontSize: 15, color: '#94a3b8', fontWeight: '600', textAlign: 'center' },

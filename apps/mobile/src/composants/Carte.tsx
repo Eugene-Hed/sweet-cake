@@ -6,6 +6,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ViewStyle, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { couleurs, rayons, espacements, typographie, ombres } from '@sweet-cake/shared';
+import { obtenirImageUri } from '../services/api';
 
 interface CarteProps {
     children: React.ReactNode;
@@ -41,7 +42,7 @@ export function CarteProduit({ nom, prix, image_url, categorie, onPress }: Carte
         <Carte onPress={onPress} style={styles.carteProduit}>
             <View style={styles.imageConteneur}>
                 {image_url ? (
-                    <Image source={{ uri: image_url }} style={styles.image} />
+                    <Image source={{ uri: obtenirImageUri(image_url) || undefined }} style={styles.image} />
                 ) : (
                     <View style={[styles.image, styles.imagePlaceholder]}>
                         <Text style={styles.imagePlaceholderTexte}>🍰</Text>

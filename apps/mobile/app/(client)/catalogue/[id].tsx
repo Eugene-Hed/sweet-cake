@@ -8,18 +8,17 @@ import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { couleurs, espacements, typographie, rayons } from '@sweet-cake/shared';
-import api from '../../../src/services/api';
+import api, { obtenirImageUri } from '../../../src/services/api';
 import Bouton from '../../../src/composants/Bouton';
 import Chargement from '../../../src/composants/Chargement';
 import { usePanierStore } from '../../../src/stores/panier.store';
-
-const URL_SERVEUR = 'http://172.20.10.2:3000';
 
 export default function DetailsProduit() {
     const { id } = useLocalSearchParams();
     const [produit, setProduit] = useState<any>(null);
     const [chargement, setChargement] = useState(true);
     const [quantite, setQuantite] = useState(1);
+    const [optionsChoisies, setOptionsChoisies] = useState<Record<string, string>>({});
     const ajouterAuPanier = usePanierStore((s) => s.ajouter);
 
     useEffect(() => {
@@ -27,6 +26,14 @@ export default function DetailsProduit() {
             try {
                 const { data } = await api.get(`/produits/${id}`);
                 setProduit(data.donnees);
+                if (data.donnees.options_produit?.length > 0) {
+                    const defaut: Record<string, string> = {};
+                    data.donnees.options_produit.forEach((o: any) => {
+                        const vals = o.valeurs.split(',').map((v: string) => v.trim());
+                        if (vals.length > 0) defaut[o.nom] = vals[0];
+                    });
+                    setOptionsChoisies(defaut);
+                }
             } catch (err) {
                 console.error('Erreur chargement produit:', err);
                 Alert.alert('Erreur', 'Impossible de charger les détails du produit.');
@@ -44,6 +51,8 @@ export default function DetailsProduit() {
             produit_id: produit.id,
             nom: produit.nom,
             prix: Number(produit.prix),
+            image_url: produit.image_url,
+            options_choisies: optionsChoisies,
         }, quantite);
         Alert.alert('✅ Ajouté !', `${quantite}x ${produit.nom} ajouté(s) au panier.`, [
             { text: 'Continuer les achats', style: 'cancel' },
@@ -60,7 +69,7 @@ export default function DetailsProduit() {
             <View style={styles.imageConteneur}>
                 <Image
                     source={produit.image_url
-                        ? { uri: `${URL_SERVEUR}${produit.image_url}` }
+                        ? { uri: obtenirImageUri(produit.image_url) || undefined }
                         : require('../../../assets/logo.png')
                     }
                     style={styles.image}
@@ -108,6 +117,33 @@ export default function DetailsProduit() {
                         <Text style={styles.avantageTexte}>Retrait rapide</Text>
                     </View>
                 </View>
+
+                {/* Options de Personnalisation */}
+                {produit.options_produit?.map((opt: any) => (
+                    <View key={opt.id} style={styles.section}>
+                        <View style={styles.enteteOption}>
+                            <Text style={styles.sectionTitre}>{opt.nom}</Text>
+                            {opt.est_obligatoire && <Text style={styles.obligatoire}>Requis</Text>}
+                        </View>
+                        <View style={styles.optionsChips}>
+                            {opt.valeurs.split(',').map((valRaw: string) => {
+                                const val = valRaw.trim();
+                                const estSelectionne = optionsChoisies[opt.nom] === val;
+                                return (
+                                    <TouchableOpacity
+                                        key={val}
+                                        style={[styles.optionChip, estSelectionne && styles.optionChipActive]}
+                                        onPress={() => setOptionsChoisies({ ...optionsChoisies, [opt.nom]: val })}
+                                    >
+                                        <Text style={[styles.optionChipTexte, estSelectionne && styles.optionChipTexteActive]}>
+                                            {val}
+                                        </Text>
+                                    </TouchableOpacity>
+                                );
+                            })}
+                        </View>
+                    </View>
+                ))}
 
                 {/* Sélection Quantité */}
                 <View style={styles.quantiteSection}>
@@ -280,4 +316,11 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderTopColor: couleurs.gris[100],
     },
+    enteteOption: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
+    obligatoire: { fontSize: 11, fontWeight: '700', color: couleurs.erreur.defaut, textTransform: 'uppercase', backgroundColor: couleurs.erreur.clair + '20', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
+    optionsChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    optionChip: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 12, backgroundColor: couleurs.gris[100], borderWidth: 1, borderColor: couleurs.gris[200] },
+    optionChipActive: { backgroundColor: couleurs.primaire.defaut, borderColor: couleurs.primaire.defaut },
+    optionChipTexte: { fontSize: 14, fontWeight: '600', color: couleurs.gris[700] },
+    optionChipTexteActive: { color: couleurs.blanc },
 });

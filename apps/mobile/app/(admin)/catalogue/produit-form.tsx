@@ -11,7 +11,8 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { couleurs, espacements, typographie, rayons } from '@sweet-cake/shared';
-import api from '../../../src/services/api';
+import api, { obtenirImageUri } from '../../../src/services/api';
+import { Image } from 'react-native';
 import ChampSaisie from '../../../src/composants/ChampSaisie';
 import Chargement from '../../../src/composants/Chargement';
 
@@ -30,6 +31,7 @@ export default function ProduitForm() {
     const [image, setImage] = useState<string | null>(null);
     const [imageLocale, setImageLocale] = useState<string | null>(null);
     const [estActif, setEstActif] = useState(true);
+    const [options, setOptions] = useState<any[]>([]); // { nom: string, valeurs: string, est_obligatoire: boolean }
 
     const [categories, setCategories] = useState<any[]>([]);
     const [chargement, setChargement] = useState(true);
@@ -50,6 +52,7 @@ export default function ProduitForm() {
                     setCategorieId(p.categorie_id);
                     setEstActif(p.est_actif);
                     setImage(p.image_url);
+                    setOptions(p.options_produit || []);
                 }
             } catch (err) {
                 console.error('Erreur chargement:', err);
@@ -121,6 +124,11 @@ export default function ProduitForm() {
                 est_actif: estActif,
                 est_disponible: true,
                 image_url: finalImageUrl,
+                options: options.map(o => ({
+                    nom: o.nom,
+                    valeurs: o.valeurs,
+                    est_obligatoire: !!o.est_obligatoire
+                })),
             };
 
             if (estEdition) {
@@ -137,6 +145,20 @@ export default function ProduitForm() {
         }
     };
 
+    const ajouterOption = () => {
+        setOptions([...options, { nom: '', valeurs: '', est_obligatoire: false }]);
+    };
+
+    const modifierOption = (index: number, champ: string, valeur: any) => {
+        const nlx = [...options];
+        nlx[index] = { ...nlx[index], [champ]: valeur };
+        setOptions(nlx);
+    };
+
+    const supprimerOption = (index: number) => {
+        setOptions(options.filter((_, i) => i !== index));
+    };
+
     if (chargement) return <Chargement />;
 
     return (
@@ -151,8 +173,13 @@ export default function ProduitForm() {
                     <TouchableOpacity style={styles.imageContainer} onPress={choisirImage}>
                         {imageLocale || image ? (
                             <View style={styles.imageWrapper}>
-                                <Text style={styles.imagePlaceholder}>Changer l'image</Text>
-                                {/* Note: On utiliserait <Image /> ici normalement, mais on simule le visuel pour l'instant */}
+                                <Image
+                                    source={{ uri: imageLocale || obtenirImageUri(image) || undefined }}
+                                    style={StyleSheet.absoluteFill}
+                                />
+                                <View style={styles.imageOverlay}>
+                                    <Text style={styles.imagePlaceholder}>Changer l'image</Text>
+                                </View>
                                 <View style={styles.badgeImage}>
                                     <Ionicons name="camera" size={20} color="#fff" />
                                 </View>
@@ -204,7 +231,6 @@ export default function ProduitForm() {
                         </View>
                     </View>
 
-                    <Text style={[styles.sectionLabel, { marginTop: 24 }]}>Catégorie</Text>
                     <View style={styles.chipsContainer}>
                         {categories.map((cat) => (
                             <TouchableOpacity
@@ -224,6 +250,54 @@ export default function ProduitForm() {
                             </TouchableOpacity>
                         ))}
                     </View>
+
+                    <View style={styles.separateur} />
+
+                    <View style={styles.enteteSectionOptions}>
+                        <Text style={styles.sectionLabel}>Options de personnalisation</Text>
+                        <TouchableOpacity style={styles.btnAjoutOption} onPress={ajouterOption}>
+                            <Ionicons name="add-circle" size={20} color={couleurs.primaire.defaut} />
+                            <Text style={styles.btnAjoutOptionTexte}>Ajouter</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {options.length === 0 ? (
+                        <View style={styles.videOptions}>
+                            <Text style={styles.videOptionsTexte}>Aucune option définie (ex: Parfum, Taille...)</Text>
+                        </View>
+                    ) : (
+                        options.map((opt, index) => (
+                            <View key={index} style={styles.optionCard}>
+                                <View style={styles.optionHeader}>
+                                    <Text style={styles.optionIndex}>Option #{index + 1}</Text>
+                                    <TouchableOpacity onPress={() => supprimerOption(index)}>
+                                        <Ionicons name="trash-outline" size={18} color={couleurs.erreur.defaut} />
+                                    </TouchableOpacity>
+                                </View>
+                                <ChampSaisie
+                                    label="NOM DE L'OPTION (EX: PARFUM)"
+                                    value={opt.nom}
+                                    onChangeText={(v) => modifierOption(index, 'nom', v)}
+                                    placeholder="Ex: Parfum"
+                                />
+                                <ChampSaisie
+                                    label="VALEURS (SÉPARÉES PAR DES VIRGULES)"
+                                    value={opt.valeurs}
+                                    onChangeText={(v) => modifierOption(index, 'valeurs', v)}
+                                    placeholder="Ex: Chocolat, Vanille, Fraise"
+                                />
+                                <View style={styles.optionFooter}>
+                                    <Text style={styles.optionObligatoireTexte}>Obligatoire ?</Text>
+                                    <Switch
+                                        value={opt.est_obligatoire}
+                                        onValueChange={(v) => modifierOption(index, 'est_obligatoire', v)}
+                                        trackColor={{ false: '#e2e8f0', true: couleurs.primaire.clair }}
+                                        thumbColor={opt.est_obligatoire ? couleurs.primaire.defaut : '#fff'}
+                                    />
+                                </View>
+                            </View>
+                        ))
+                    )}
 
                     <TouchableOpacity
                         style={styles.saveBtn}
@@ -295,9 +369,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'rgba(107, 73, 58, 0.05)',
     },
+    imageOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     imagePlaceholder: {
         fontSize: 14,
-        color: couleurs.primaire.defaut,
+        color: '#fff',
         fontWeight: '800',
     },
     badgeImage: {
@@ -353,6 +433,68 @@ const styles = StyleSheet.create({
     },
     chipText: { fontSize: 13, color: '#64748b', fontWeight: '700' },
     chipTextActive: { color: '#fff' },
+    separateur: { height: 1, backgroundColor: '#f1f5f9', marginVertical: 24 },
+    enteteSectionOptions: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 16
+    },
+    btnAjoutOption: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4
+    },
+    btnAjoutOptionTexte: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: couleurs.primaire.defaut
+    },
+    videOptions: {
+        padding: 20,
+        backgroundColor: '#f8fafc',
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: '#f1f5f9',
+        alignItems: 'center',
+        marginBottom: 24
+    },
+    videOptionsTexte: {
+        fontSize: 13,
+        color: '#94a3b8',
+        fontStyle: 'italic'
+    },
+    optionCard: {
+        backgroundColor: '#f8fafc',
+        borderRadius: 20,
+        padding: 16,
+        marginBottom: 16,
+        borderWidth: 1,
+        borderColor: '#f1f5f9'
+    },
+    optionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 12
+    },
+    optionIndex: {
+        fontSize: 11,
+        fontWeight: '800',
+        color: couleurs.primaire.defaut,
+        textTransform: 'uppercase'
+    },
+    optionFooter: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 8
+    },
+    optionObligatoireTexte: {
+        fontSize: 12,
+        fontWeight: '700',
+        color: '#64748b'
+    },
     saveBtn: {
         borderRadius: 18,
         overflow: 'hidden',

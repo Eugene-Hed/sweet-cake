@@ -21,6 +21,7 @@ export default function Panier() {
             const lignes = articles.map((a) => ({
                 produit_id: a.produit_id,
                 quantite: a.quantite,
+                options_choisies: a.options_choisies,
             }));
             await api.post('/commandes', {
                 type_commande: 'retrait',
@@ -79,25 +80,34 @@ export default function Panier() {
                         </View>
                         <View style={styles.articleInfo}>
                             <Text style={styles.articleNom} numberOfLines={1}>{article.nom}</Text>
+                            {article.options_choisies && Object.entries(article.options_choisies).length > 0 && (
+                                <View style={styles.optionsListe}>
+                                    {Object.entries(article.options_choisies).map(([label, valeur]) => (
+                                        <Text key={label} style={styles.optionItemTexte}>
+                                            {label}: <Text style={{ color: couleurs.gris[800] }}>{valeur}</Text>
+                                        </Text>
+                                    ))}
+                                </View>
+                            )}
                             <Text style={styles.articlePrix}>{article.prix.toLocaleString()} FCFA</Text>
                         </View>
                         <View style={styles.quantiteConteneur}>
                             <TouchableOpacity
                                 style={styles.quantiteBtn}
-                                onPress={() => modifierQuantite(article.produit_id, article.quantite - 1)}
+                                onPress={() => modifierQuantite(article.produit_id, article.quantite - 1, article.options_choisies)}
                             >
                                 <Ionicons name="remove" size={16} color={couleurs.gris[700]} />
                             </TouchableOpacity>
                             <Text style={styles.quantiteValeur}>{article.quantite}</Text>
                             <TouchableOpacity
                                 style={[styles.quantiteBtn, styles.quantiteBtnPlus]}
-                                onPress={() => modifierQuantite(article.produit_id, article.quantite + 1)}
+                                onPress={() => modifierQuantite(article.produit_id, article.quantite + 1, article.options_choisies)}
                             >
                                 <Ionicons name="add" size={16} color={couleurs.blanc} />
                             </TouchableOpacity>
                         </View>
                         <TouchableOpacity
-                            onPress={() => retirer(article.produit_id)}
+                            onPress={() => retirer(article.produit_id, article.options_choisies)}
                             style={styles.supprimerBtn}
                         >
                             <Ionicons name="trash-outline" size={18} color={couleurs.erreur.defaut} />
@@ -171,6 +181,8 @@ const styles = StyleSheet.create({
     },
     articleInfo: { flex: 1 },
     articleNom: { fontSize: 14, fontWeight: '600', color: couleurs.gris[900], marginBottom: 2 },
+    optionsListe: { marginBottom: 4 },
+    optionItemTexte: { fontSize: 11, color: couleurs.gris[500], fontWeight: '500' },
     articlePrix: { fontSize: 13, color: couleurs.primaire.defaut, fontWeight: '700' },
     quantiteConteneur: { flexDirection: 'row', alignItems: 'center', marginRight: 10 },
     quantiteBtn: {

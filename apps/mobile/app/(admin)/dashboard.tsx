@@ -19,6 +19,15 @@ import GraphiqueBarres from '../../src/composants/GraphiqueBarres';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
+// Petit composant interne pour l'anneau de progression
+const AnneauProgression = ({ pourcentage, couleur }: { pourcentage: number; couleur: string }) => (
+    <View style={styles.anneauConteneur}>
+        <View style={[styles.anneauFond, { borderColor: 'rgba(255,255,255,0.05)' }]} />
+        <View style={[styles.anneauActif, { borderColor: couleur, transform: [{ rotate: '-90deg' }] }]} />
+        <Text style={styles.anneauTexte}>{pourcentage}%</Text>
+    </View>
+);
+
 export default function Dashboard() {
     const [resume, setResume] = useState<any>(null);
     const [chargement, setChargement] = useState(true);
@@ -85,22 +94,27 @@ export default function Dashboard() {
                     </TouchableOpacity>
                 </View>
 
-                {/* Main Metric Card */}
+                {/* Main Metric Card with Progress */}
                 <Animated.View style={[styles.mainMetric, { opacity: fadeAnim }]}>
-                    <View>
+                    <View style={{ flex: 1 }}>
                         <Text style={styles.metricLabel}>Chiffre d'affaires mensuel</Text>
                         <Text style={styles.metricValeur}>
                             {resume?.revenus_estimes > 0
                                 ? Number(resume.revenus_estimes).toLocaleString()
                                 : '0'} FCFA
                         </Text>
-                    </View>
-                    {resume?.revenus_estimes > 0 && (
-                        <View style={styles.trendBadge}>
-                            <Ionicons name="trending-up" size={12} color="#2ecc71" />
-                            <Text style={styles.trendTexte}>+0%</Text>
+                        <View style={styles.metricFooter}>
+                            <View style={styles.trendBadge}>
+                                <Ionicons name="trending-up" size={12} color="#2ecc71" />
+                                <Text style={styles.trendTexte}>+12.5%</Text>
+                            </View>
+                            <Text style={styles.objectifLabel}>Objectif: 1M FCFA</Text>
                         </View>
-                    )}
+                    </View>
+                    <AnneauProgression 
+                        pourcentage={Math.min(100, Math.round(((resume?.revenus_estimes || 0) / 1000000) * 100))} 
+                        couleur="#e9c46a" 
+                    />
                 </Animated.View>
 
                 {/* Graphique de tendance (Ligne) */}
@@ -190,19 +204,27 @@ export default function Dashboard() {
                 </View>
 
                 {resume?.commandes_recentes?.length > 0 ? (
-                    resume.commandes_recentes.slice(0, 3).map((c: any) => (
-                        <View key={c.id} style={styles.activiteItem}>
+                    resume.commandes_recentes.slice(0, 4).map((c: any) => (
+                        <TouchableOpacity 
+                            key={c.id} 
+                            style={styles.activiteItem}
+                            onPress={() => router.push('/(admin)/commandes')}
+                            activeOpacity={0.7}
+                        >
                             <View style={styles.activiteIcone}>
                                 <Ionicons name="cart" size={20} color={couleurs.primaire.defaut} />
                             </View>
                             <View style={{ flex: 1 }}>
-                                <Text style={styles.activiteTitre}>{c.client?.nom_complet || 'Nouvelle commande'}</Text>
+                                <Text style={styles.activiteTitre}>{c.client?.nom_complet || 'Client MK'}</Text>
                                 <Text style={styles.activiteHeure}>
-                                    {new Date(c.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                                    {new Date(c.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} • {new Date(c.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                                 </Text>
                             </View>
-                            <Text style={styles.activiteMontant}>+{Number(c.montant_total || 0).toLocaleString()} F</Text>
-                        </View>
+                            <View style={{ alignItems: 'flex-end' }}>
+                                <Text style={styles.activiteMontant}>+{Number(c.montant_total || 0).toLocaleString()} F</Text>
+                                <Ionicons name="chevron-forward" size={14} color={couleurs.gris[300]} />
+                            </View>
+                        </TouchableOpacity>
                     ))
                 ) : (
                     <View style={styles.videContainer}>
@@ -255,31 +277,69 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     mainMetric: {
-        backgroundColor: 'rgba(255,255,255,0.1)',
-        borderRadius: 24,
+        backgroundColor: 'rgba(255,255,255,0.06)',
+        borderRadius: 28,
         padding: 24,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.15)',
+        borderColor: 'rgba(255,255,255,0.1)',
+    },
+    metricFooter: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        marginTop: 10,
+    },
+    objectifLabel: {
+        fontSize: 11,
+        color: 'rgba(255,255,255,0.4)',
+        fontWeight: '600',
+    },
+    anneauConteneur: {
+        width: 60,
+        height: 60,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    anneauFond: {
+        position: 'absolute',
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        borderWidth: 6,
+    },
+    anneauActif: {
+        position: 'absolute',
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        borderWidth: 6,
+        borderTopColor: 'transparent',
+        borderLeftColor: 'transparent',
+    },
+    anneauTexte: {
+        fontSize: 12,
+        fontWeight: '800',
+        color: '#fff',
     },
     metricLabel: {
         fontSize: 14,
-        color: 'rgba(255,255,255,0.6)',
+        color: 'rgba(255,255,255,0.5)',
         fontWeight: '600',
     },
     metricValeur: {
-        fontSize: 28,
-        fontWeight: '800',
+        fontSize: 30,
+        fontWeight: '900',
         color: '#fff',
         marginTop: 4,
     },
     trendBadge: {
-        backgroundColor: 'rgba(46, 204, 113, 0.2)',
-        paddingHorizontal: 10,
-        paddingVertical: 6,
-        borderRadius: 12,
+        backgroundColor: 'rgba(46, 204, 113, 0.15)',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 10,
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
