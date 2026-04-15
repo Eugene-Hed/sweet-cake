@@ -5,6 +5,11 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
+    // Correctif pour la sérialisation des BigInt (Prisma + JSON.stringify)
+    (BigInt.prototype as any).toJSON = function () {
+        return Number(this);
+    };
+
     const logger = new Logger('Bootstrap');
     const app = await NestFactory.create(AppModule, {
         logger: ['error', 'warn', 'log', 'debug', 'verbose'],
@@ -69,7 +74,7 @@ async function bootstrap() {
     });
 
     const port = process.env.PORT || 3000;
-    await app.listen(port);
+    await app.listen(port, '0.0.0.0');
 
     logger.log(`🍰 Sweet-Cake API démarrée sur le port ${port}`);
     logger.log(`📖 Documentation Swagger : http://localhost:${port}/api/docs`);

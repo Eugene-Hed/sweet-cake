@@ -62,6 +62,11 @@ export default function DetailsCommande() {
                         </View>
                         <View style={styles.articleInfos}>
                             <Text style={styles.articleNom}>{ligne.produit?.nom || 'Produit'}</Text>
+                            {ligne.options_choisies && Object.entries(ligne.options_choisies).length > 0 && (
+                                <Text style={styles.articleOptions}>
+                                    {Object.entries(ligne.options_choisies).map(([k, v]) => `${k}: ${v}`).join(', ')}
+                                </Text>
+                            )}
                             <Text style={styles.articleQuantite}>Quantité : {ligne.quantite}</Text>
                         </View>
                         <Text style={styles.articlePrix}>{(Number(ligne.prix_unitaire) * ligne.quantite).toLocaleString()} FCFA</Text>
@@ -73,7 +78,7 @@ export default function DetailsCommande() {
             <View style={styles.sectionTotal}>
                 <View style={styles.totalLigne}>
                     <Text style={styles.totalLabel}>Total payé</Text>
-                    <Text style={styles.totalValeur}>{Number(commande.total).toLocaleString()} FCFA</Text>
+                    <Text style={styles.totalValeur}>{Number(commande.montant_total).toLocaleString()} FCFA</Text>
                 </View>
             </View>
 
@@ -144,6 +149,7 @@ const styles = StyleSheet.create({
     },
     articleInfos: { flex: 1 },
     articleNom: { fontSize: 15, fontWeight: '600', color: couleurs.gris[900] },
+    articleOptions: { fontSize: 12, color: couleurs.primaire.defaut, fontWeight: '600' },
     articleQuantite: { fontSize: 13, color: couleurs.gris[500], marginTop: 2 },
     articlePrix: { fontSize: 15, fontWeight: '700', color: couleurs.primaire.defaut },
     sectionTotal: {

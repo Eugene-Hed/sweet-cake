@@ -8,12 +8,11 @@ import {
     Alert, Platform, TextInput, Dimensions, Image
 } from 'react-native';
 
-const URL_SERVEUR = 'http://172.20.10.2:3000';
+import api, { obtenirImageUri } from '../../../src/services/api';
 import { useFocusEffect, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { couleurs, espacements, typographie, rayons } from '@sweet-cake/shared';
-import api from '../../../src/services/api';
 import Chargement from '../../../src/composants/Chargement';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -101,7 +100,7 @@ export default function ProduitsAdmin() {
                                 <View style={styles.imageMiniature}>
                                     {p.image_url ? (
                                         <Image
-                                            source={{ uri: `${URL_SERVEUR}${p.image_url}` }}
+                                            source={{ uri: obtenirImageUri(p.image_url) || undefined }}
                                             style={styles.image}
                                             resizeMode="cover"
                                         />

@@ -39,45 +39,45 @@ export default function AdminLayout() {
             screenOptions={{
                 headerShown: true,
                 headerStyle: {
-                    backgroundColor: couleurs.gris[900],
+                    backgroundColor: '#0f172a', // Navy profond pour cohérence
                     elevation: 0,
                     shadowOpacity: 0,
                     borderBottomWidth: 0,
                 },
-                headerTintColor: couleurs.blanc,
+                headerTintColor: '#e9c46a', // Titre en Or
                 headerTitleStyle: {
-                    fontWeight: '800',
-                    fontSize: 20,
-                    letterSpacing: 0.5,
+                    fontWeight: '900',
+                    fontSize: 22,
+                    letterSpacing: -0.5,
                 },
-                tabBarActiveTintColor: couleurs.secondaire.defaut,
-                tabBarInactiveTintColor: 'rgba(255,255,255,0.4)',
+                tabBarActiveTintColor: '#e9c46a', // Or pour l'icône active
+                tabBarInactiveTintColor: 'rgba(255,255,255,0.3)',
                 tabBarStyle: {
-                    backgroundColor: 'rgba(15, 23, 42, 0.9)', // Navy profond avec transparence
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)', // Navy encore plus profond
                     borderTopWidth: 0,
-                    height: 64,
+                    height: 68,
                     position: 'absolute',
                     bottom: 24,
                     left: 20,
                     right: 20,
-                    borderRadius: 32,
+                    borderRadius: 34,
                     paddingBottom: 0,
                     ...Platform.select({
                         ios: {
                             shadowColor: '#000',
-                            shadowOffset: { width: 0, height: 8 },
-                            shadowOpacity: 0.4,
-                            shadowRadius: 15,
+                            shadowOffset: { width: 0, height: 12 },
+                            shadowOpacity: 0.5,
+                            shadowRadius: 18,
                         },
                         android: {
-                            elevation: 12,
+                            elevation: 15,
                         },
                     }),
                 },
                 tabBarLabelStyle: {
                     fontSize: 10,
-                    fontWeight: '700',
-                    marginBottom: 8,
+                    fontWeight: '800',
+                    marginBottom: 10,
                 },
             }}
         >
@@ -122,6 +122,12 @@ export default function AdminLayout() {
                     ),
                 }}
             />
+
+            {/* Écrans masqués de la barre de tâches (accessibles via navigation uniquement) */}
+            <Tabs.Screen name="atelier-form" options={{ href: null }} />
+            <Tabs.Screen name="ateliers-admin" options={{ href: null }} />
+            <Tabs.Screen name="stock" options={{ href: null }} />
+            <Tabs.Screen name="stock-form" options={{ href: null }} />
         </Tabs>
     );
 }

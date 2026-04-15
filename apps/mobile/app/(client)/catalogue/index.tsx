@@ -7,12 +7,10 @@ import { View, Text, ScrollView, StyleSheet, TextInput, TouchableOpacity, Refres
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { couleurs, espacements, typographie, rayons } from '@sweet-cake/shared';
-import api from '../../../src/services/api';
+import api, { obtenirImageUri } from '../../../src/services/api';
 import { CarteProduit } from '../../../src/composants/Carte';
 import Chargement from '../../../src/composants/Chargement';
 import EnteteSection from '../../../src/composants/EnteteSection';
-
-const URL_SERVEUR = 'http://172.20.10.2:3000';
 
 export default function Catalogue() {
     const [produits, setProduits] = useState<any[]>([]);
@@ -115,7 +113,7 @@ export default function Catalogue() {
                             key={p.id}
                             nom={p.nom}
                             prix={Number(p.prix)}
-                            image_url={p.image_url ? `${URL_SERVEUR}${p.image_url}` : undefined}
+                            image_url={obtenirImageUri(p.image_url) || undefined}
                             categorie={p.categorie?.nom}
                             onPress={() => router.push(`/(client)/catalogue/${p.id}`)}
                         />

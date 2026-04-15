@@ -63,7 +63,7 @@ import { SanteModule } from './modules/sante/sante.module';
 
         // Fichiers statiques (Uploads)
         ServeStaticModule.forRoot({
-            rootPath: join(__dirname, '..', 'uploads'),
+            rootPath: join(process.cwd(), 'uploads'),
             serveRoot: '/uploads',
         }),
     ],

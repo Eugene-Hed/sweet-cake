@@ -130,7 +130,7 @@ export default function Profil() {
                             />
                         </View>
                         <View style={styles.itemPied}>
-                            <Text style={styles.itemTotal}>{Number(c.total).toLocaleString()} FCFA</Text>
+                            <Text style={styles.itemTotal}>{Number(c.montant_total).toLocaleString()} FCFA</Text>
                         </View>
                     </TouchableOpacity>
                 )) : (

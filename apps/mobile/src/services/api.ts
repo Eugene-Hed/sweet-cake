@@ -6,12 +6,23 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { ReponseApi } from '@sweet-cake/shared';
 
-const BASE_URL = 'http://172.20.10.2:3000/api/v1';
+const BASE_URL = 'http://192.168.9.134:3000/api/v1';
 
 export const CLES_STOCKAGE = {
     JETON_ACCES: 'jeton_acces',
     JETON_RAFRAICHISSEMENT: 'jeton_rafraichissement',
 } as const;
+
+/**
+ * Transforme un chemin relatif en URL complète pour les images uploadées.
+ * ex: '/uploads/produits/image.jpg' -> 'http://192.168.9.134:3000/uploads/produits/image.jpg'
+ */
+export const obtenirImageUri = (chemin: string | null | undefined): string | null => {
+    if (!chemin) return null;
+    if (chemin.startsWith('http')) return chemin;
+    const base = BASE_URL.replace('/api/v1', '');
+    return `${base}${chemin.startsWith('/') ? '' : '/'}${chemin}`;
+};
 
 const api = axios.create({
     baseURL: BASE_URL,
