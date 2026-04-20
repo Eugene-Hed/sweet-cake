@@ -34,7 +34,7 @@ import { SanteModule } from './modules/sante/sante.module';
         // Configuration
         ConfigModule.forRoot({
             isGlobal: true,
-            envFilePath: ['.env', '.env.local'],
+            envFilePath: ['../../.env', '../../.env.local', '.env', '.env.local'],
         }),
 
         // Rate limiting

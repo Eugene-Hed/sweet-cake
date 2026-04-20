@@ -1,0 +1,268 @@
+/* =============================================================================
+ * Sweet-Cake Back-Office — Styles des composants
+ * Sublime avec des effets premium et cohérent avec le Design System
+ * ============================================================================= */
+
+/* ─── Boutons ─────────────────────────────────────────────────────────────── */
+
+.bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espace-sm);
+  font-size: var(--taille-texte-bouton);
+  font-weight: var(--poids-semi-gras);
+  line-height: 1;
+  border: 1px solid transparent;
+  border-radius: var(--rayon-md);
+  padding: 0 var(--espace-lg);
+  height: var(--taille-bouton-md);
+  cursor: pointer;
+  transition: all var(--transition-normale);
+  white-space: nowrap;
+  user-select: none;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.bouton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+.bouton:active {
+  transform: scale(0.96);
+}
+
+.bouton--primaire {
+  background: var(--couleur-primaire);
+  color: var(--couleur-texte-inverse);
+  box-shadow: 0 4px 14px 0 rgba(232, 96, 138, 0.2);
+}
+
+.bouton--primaire:hover:not(:disabled) {
+  background: var(--couleur-primaire-fonce);
+  box-shadow: 0 6px 20px rgba(232, 96, 138, 0.3);
+  transform: translateY(-2px);
+}
+
+.bouton--secondaire {
+  background: transparent;
+  color: var(--couleur-primaire);
+  border-color: var(--couleur-primaire);
+}
+
+.bouton--secondaire:hover:not(:disabled) {
+  background: rgba(232, 96, 138, 0.05);
+  transform: translateY(-1px);
+}
+
+.bouton--danger {
+  background: var(--couleur-erreur);
+  color: var(--couleur-texte-inverse);
+}
+
+.bouton--danger:hover:not(:disabled) {
+  background: var(--couleur-erreur-fonce);
+  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.25);
+  transform: translateY(-2px);
+}
+
+.bouton--fantome {
+  background: transparent;
+  color: var(--couleur-texte-secondaire);
+}
+
+.bouton--fantome:hover:not(:disabled) {
+  background: var(--couleur-fond-secondaire);
+  color: var(--couleur-texte-principal);
+}
+
+.bouton--sm { height: var(--taille-bouton-sm); padding: 0 var(--espace-md); font-size: var(--taille-legende); border-radius: var(--rayon-sm); }
+.bouton--lg { height: var(--taille-bouton-lg); padding: 0 var(--espace-xl); font-size: var(--taille-texte-corps); }
+
+/* ─── Champs de saisie ────────────────────────────────────────────────────── */
+
+.champ-groupe {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-xs);
+}
+
+.champ-label {
+  font-size: var(--taille-texte-secondaire);
+  font-weight: var(--poids-medium);
+  color: var(--couleur-texte-principal);
+  margin-left: var(--espace-2xs);
+}
+
+.champ-saisie {
+  width: 100%;
+  height: var(--taille-champ-md);
+  padding: 0 var(--espace-md);
+  font-size: var(--taille-texte-corps);
+  color: var(--couleur-texte-principal);
+  background: var(--couleur-surface);
+  border: 2px solid var(--couleur-bordure-legere);
+  border-radius: var(--rayon-md);
+  outline: none;
+  transition: all var(--transition-normale);
+}
+
+.champ-saisie::placeholder {
+  color: var(--couleur-texte-desactive);
+}
+
+.champ-saisie:hover:not(:disabled) {
+  border-color: var(--couleur-bordure);
+}
+
+.champ-saisie:focus {
+  border-color: var(--couleur-primaire-clair);
+  box-shadow: 0 0 0 4px rgba(232, 96, 138, 0.1);
+  background: var(--couleur-surface);
+}
+
+.champ-saisie--erreur {
+  border-color: var(--couleur-erreur-clair);
+}
+
+.champ-saisie--erreur:focus {
+  border-color: var(--couleur-erreur);
+  box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.1);
+}
+
+/* ─── Cartes ──────────────────────────────────────────────────────────────── */
+
+.carte {
+  background: var(--couleur-surface);
+  border: 1px solid var(--couleur-bordure-legere);
+  border-radius: var(--rayon-lg);
+  padding: var(--espace-lg);
+  box-shadow: var(--ombre-sm);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.carte--hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--ombre-lg);
+  border-color: var(--couleur-primaire-clair);
+}
+
+.carte--premium {
+  border: none;
+  background: linear-gradient(135deg, var(--couleur-surface) 0%, var(--couleur-fond-secondaire) 100%);
+  box-shadow: var(--ombre-premium);
+}
+
+/* ─── Badges ──────────────────────────────────────────────────────────────── */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espace-xs);
+  padding: 2px 10px;
+  font-size: var(--taille-legende);
+  font-weight: var(--poids-semi-gras);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-radius: var(--rayon-complet);
+  white-space: nowrap;
+}
+
+.badge--primaire { background: var(--couleur-primaire-clair); color: var(--couleur-primaire-fonce); }
+.badge--succes { background: var(--couleur-succes-clair); color: var(--couleur-succes-fonce); }
+.badge--erreur { background: var(--couleur-erreur-clair); color: var(--couleur-erreur-fonce); }
+.badge--avertissement { background: var(--couleur-avertissement-clair); color: var(--couleur-avertissement-fonce); }
+.badge--information { background: var(--couleur-information-clair); color: var(--couleur-information-fonce); }
+.badge--neutre { background: var(--gris-200); color: var(--gris-700); }
+
+/* ─── Tableaux ────────────────────────────────────────────────────────────── */
+
+.tableau-conteneur {
+  width: 100%;
+  overflow-x: auto;
+  background: var(--couleur-surface);
+  border: 1px solid var(--couleur-bordure-legere);
+  border-radius: var(--rayon-xl);
+  box-shadow: var(--ombre-sm);
+}
+
+.tableau {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.tableau th {
+  padding: var(--espace-md) var(--espace-lg);
+  font-size: var(--taille-texte-secondaire);
+  font-weight: var(--poids-semi-gras);
+  color: var(--couleur-texte-secondaire);
+  text-align: left;
+  background: var(--couleur-fond-secondaire);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--couleur-bordure-legere);
+}
+
+.tableau td {
+  padding: var(--espace-md) var(--espace-lg);
+  font-size: var(--taille-texte-secondaire);
+  color: var(--couleur-texte-principal);
+  border-bottom: 1px solid var(--couleur-bordure-legere);
+  transition: all var(--transition-rapide);
+}
+
+.tableau tr:hover td {
+  background: rgba(232, 96, 138, 0.02);
+}
+
+/* ─── Modale ──────────────────────────────────────────────────────────────── */
+
+.modale-overlay {
+  background: var(--couleur-overlay);
+  backdrop-filter: blur(8px);
+}
+
+.modale {
+  border-radius: var(--rayon-2xl);
+  box-shadow: var(--ombre-xl);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ─── Carte Statistique ───────────────────────────────────────────────────── */
+
+.carte-stat {
+  padding: var(--espace-xl);
+  border-radius: var(--rayon-xl);
+  border: none;
+  box-shadow: var(--ombre-premium);
+}
+
+.carte-stat-icone {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--rayon-lg);
+  margin-bottom: var(--espace-md);
+  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.1);
+}
+
+.carte-stat-valeur {
+  font-size: 2.25rem;
+  letter-spacing: -0.02em;
+}
+
+/* ─── Alertes ─────────────────────────────────────────────────────────── */
+
+.alerte {
+  border: none;
+  border-radius: var(--rayon-lg);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.alerte--succes { background: linear-gradient(to right, var(--couleur-succes-clair), transparent); border-left: 4px solid var(--couleur-succes); }
+.alerte--erreur { background: linear-gradient(to right, var(--couleur-erreur-clair), transparent); border-left: 4px solid var(--couleur-erreur); }

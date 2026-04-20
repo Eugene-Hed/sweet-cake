@@ -1,0 +1,22 @@
+/* =============================================================================
+ * Layout Admin — Styles
+ * ============================================================================= */
+
+.admin-layout {
+  min-height: 100vh;
+}
+
+.admin-contenu {
+  margin-left: var(--largeur-sidebar);
+  margin-top: var(--hauteur-entete);
+  padding: var(--espace-lg);
+  min-height: calc(100vh - var(--hauteur-entete));
+  transition: margin-left var(--transition-normale);
+  animation: fadeIn var(--transition-normale) ease-out;
+}
+
+@media (max-width: 1024px) {
+  .admin-contenu {
+    margin-left: 0;
+  }
+}

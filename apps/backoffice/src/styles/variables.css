@@ -1,0 +1,183 @@
+/* =============================================================================
+ * Sweet-Cake Design System — Variables CSS
+ * Aligné sur @sweet-cake/shared/design
+ * ============================================================================= */
+
+:root {
+  /* --- Couleurs primaires (rose pâtissier) --- */
+  --couleur-primaire: #E8608A;
+  --couleur-primaire-clair: #F8A4C8;
+  --couleur-primaire-fonce: #C43D66;
+
+  /* --- Couleurs secondaires (doré crème) --- */
+  --couleur-secondaire: #F5C563;
+  --couleur-secondaire-clair: #FFF0D4;
+  --couleur-secondaire-fonce: #D4A03A;
+
+  /* --- Accent (caramel cuivré) --- */
+  --couleur-accent: #D4883E;
+  --couleur-accent-clair: #F5D0A9;
+  --couleur-accent-fonce: #A86A2E;
+
+  /* --- Sémantiques --- */
+  --couleur-succes: #28A745;
+  --couleur-succes-clair: #D4EDDA;
+  --couleur-succes-fonce: #1E7E34;
+  --couleur-erreur: #DC3545;
+  --couleur-erreur-clair: #F8D7DA;
+  --couleur-erreur-fonce: #BD2130;
+  --couleur-avertissement: #FFC107;
+  --couleur-avertissement-clair: #FFF3CD;
+  --couleur-avertissement-fonce: #D39E00;
+  --couleur-information: #17A2B8;
+  --couleur-information-clair: #D1ECF1;
+  --couleur-information-fonce: #117A8B;
+
+  /* --- Surfaces (thème clair) --- */
+  --couleur-fond: #FAFAFA;
+  --couleur-fond-secondaire: #F5F5F5;
+  --couleur-surface: #FFFFFF;
+  --couleur-surface-elevee: #FFFFFF;
+  --couleur-surface-transparente: rgba(255, 255, 255, 0.8);
+  --couleur-overlay: rgba(0, 0, 0, 0.4);
+
+  /* --- Textes --- */
+  --couleur-texte-principal: #212121;
+  --couleur-texte-secondaire: #757575;
+  --couleur-texte-desactive: #BDBDBD;
+  --couleur-texte-inverse: #FFFFFF;
+
+  /* --- Bordures --- */
+  --couleur-bordure: #E0E0E0;
+  --couleur-bordure-legere: #EEEEEE;
+  --couleur-diviseur: #EEEEEE;
+
+  /* --- Gris --- */
+  --gris-50: #FAFAFA;
+  --gris-100: #F5F5F5;
+  --gris-200: #EEEEEE;
+  --gris-300: #E0E0E0;
+  --gris-400: #BDBDBD;
+  --gris-500: #9E9E9E;
+  --gris-600: #757575;
+  --gris-700: #616161;
+  --gris-800: #424242;
+  --gris-900: #212121;
+
+  /* --- Typographie --- */
+  --police-principale: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --taille-titre-principal: 2rem;       /* 32px */
+  --taille-titre-secondaire: 1.5rem;    /* 24px */
+  --taille-sous-titre: 1.25rem;         /* 20px */
+  --taille-texte-corps: 1rem;           /* 16px */
+  --taille-texte-secondaire: 0.875rem;  /* 14px */
+  --taille-texte-bouton: 0.875rem;      /* 14px */
+  --taille-legende: 0.75rem;            /* 12px */
+  
+  --poids-normal: 400;
+  --poids-medium: 500;
+  --poids-semi-gras: 600;
+  --poids-gras: 700;
+
+  /* --- Espacements --- */
+  --espace-2xs: 2px;
+  --espace-xs: 4px;
+  --espace-sm: 8px;
+  --espace-md-sm: 12px;
+  --espace-md: 16px;
+  --espace-md-lg: 20px;
+  --espace-lg: 24px;
+  --espace-xl: 32px;
+  --espace-2xl: 40px;
+  --espace-3xl: 48px;
+  --espace-4xl: 64px;
+  --espace-5xl: 80px;
+
+  /* --- Rayons --- */
+  --rayon-aucun: 0px;
+  --rayon-sm: 4px;
+  --rayon-md: 8px;
+  --rayon-lg: 12px;
+  --rayon-xl: 16px;
+  --rayon-2xl: 24px;
+  --rayon-complet: 9999px;
+
+  /* --- Ombres --- */
+  --ombre-aucune: none;
+  --ombre-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --ombre-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --ombre-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --ombre-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --ombre-premium: 0 10px 40px -10px rgba(232, 96, 138, 0.15);
+
+  /* --- Tailles --- */
+  --taille-bouton-sm: 32px;
+  --taille-bouton-md: 40px;
+  --taille-bouton-lg: 48px;
+  --taille-champ-sm: 32px;
+  --taille-champ-md: 40px;
+  --taille-champ-lg: 48px;
+
+  /* --- Sidebar --- */
+  --largeur-sidebar: 260px;
+  --largeur-sidebar-reduite: 72px;
+  --hauteur-entete: 64px;
+
+  /* --- Transitions --- */
+  --transition-rapide: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normale: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-lente: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- Thème sombre --- */
+[data-theme="sombre"] {
+  --couleur-primaire: #F8A4C8;
+  --couleur-primaire-clair: #F8A4C8;
+  --couleur-primaire-fonce: #E8608A;
+  --couleur-secondaire: #FFF0D4;
+  --couleur-secondaire-clair: #FFF0D4;
+  --couleur-secondaire-fonce: #F5C563;
+  --couleur-accent: #F5D0A9;
+  --couleur-accent-clair: #F5D0A9;
+  --couleur-accent-fonce: #D4883E;
+
+  --couleur-succes: #4ADE80;
+  --couleur-succes-clair: rgba(74, 222, 128, 0.1);
+  --couleur-erreur: #F87171;
+  --couleur-erreur-clair: rgba(248, 113, 113, 0.1);
+  --couleur-avertissement: #FBBF24;
+  --couleur-avertissement-clair: rgba(251, 191, 36, 0.1);
+  --couleur-information: #38BDF8;
+  --couleur-information-clair: rgba(56, 189, 248, 0.1);
+
+  --couleur-fond: #0F0F1A;
+  --couleur-fond-secondaire: #1A1A2E;
+  --couleur-surface: #1E1E2F;
+  --couleur-surface-elevee: #29293F;
+  --couleur-surface-transparente: rgba(30, 30, 47, 0.8);
+
+  --couleur-texte-principal: #F0F0F5;
+  --couleur-texte-secondaire: #A0A0B8;
+  --couleur-texte-desactive: #606078;
+  --couleur-texte-inverse: #212121;
+
+  --couleur-bordure: #36364D;
+  --couleur-bordure-legere: #2E2E42;
+  --couleur-diviseur: #2A2A3E;
+
+  --gris-50: #1A1A2E;
+  --gris-100: #242438;
+  --gris-200: #2E2E48;
+  --gris-300: #3A3A50;
+  --gris-400: #606078;
+  --gris-500: #8080A0;
+  --gris-600: #A0A0B8;
+  --gris-700: #C0C0D0;
+  --gris-800: #D0D0E0;
+  --gris-900: #F0F0F5;
+  
+  --ombre-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --ombre-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  --ombre-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+  --ombre-premium: 0 10px 40px -10px rgba(0, 0, 0, 1);
+}

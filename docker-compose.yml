@@ -72,6 +72,23 @@ services:
     networks:
       - sweet-cake-network
 
+  # --- phpMyAdmin ---
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: sweet-cake-phpmyadmin
+    ports:
+      - '8080:80'
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password_dev}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - sweet-cake-network
+
 volumes:
   sweet-cake-mysql-data:
     driver: local

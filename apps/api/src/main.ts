@@ -1,8 +1,14 @@
+import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
+
+// Patch pour la sérialisation des BigInt en JSON
+(BigInt.prototype as any).toJSON = function () {
+    return Number(this);
+};
 
 async function bootstrap() {
     const logger = new Logger('Bootstrap');

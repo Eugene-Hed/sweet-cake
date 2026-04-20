@@ -1,0 +1,132 @@
+/* =============================================================================
+   Design Système du Tableau de Bord Premium
+   ============================================================================= */
+
+.dashboard {
+  padding: 10px 5px;
+}
+
+/* Grille de Statistiques */
+.dashboard-grille-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--espace-lg);
+  margin-bottom: var(--espace-xl);
+}
+
+.carte-stat-premium {
+  background: var(--couleur-surface);
+  border: 1px solid var(--couleur-bordure-legere);
+  border-radius: var(--rayon-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-rapide);
+  box-shadow: var(--ombre-sm);
+}
+
+.carte-stat-premium:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--ombre-lg);
+  border-color: var(--carte-stat-couleur);
+}
+
+.carte-stat-premium::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, var(--carte-stat-couleur) 0%, transparent 70%);
+  opacity: 0.05;
+  transform: translate(30%, -30%);
+}
+
+.carte-stat-premium-en-haut {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.carte-stat-premium-icone {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--carte-stat-fond);
+  color: var(--carte-stat-couleur);
+}
+
+.carte-stat-premium-tendance {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tendance--hausse { background: rgba(40, 167, 69, 0.1); color: #28a745; }
+.tendance--baisse { background: rgba(220, 53, 69, 0.1); color: #dc3545; }
+
+.carte-stat-premium-valeur {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--couleur-texte-principal);
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.carte-stat-premium-label {
+  font-size: 14px;
+  color: var(--couleur-texte-secondaire);
+  font-weight: 500;
+}
+
+/* Sections du Dashboard */
+.dashboard-contenu-grille {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--espace-xl);
+}
+
+.dashboard-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-md);
+}
+
+.dashboard-section-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.dashboard-section-entete h2 {
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Adaptabilité Mobile */
+@media (max-width: 1200px) {
+  .dashboard-contenu-grille {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-grille-stats {
+    grid-template-columns: 1fr;
+  }
+}
