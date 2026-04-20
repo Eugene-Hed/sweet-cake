@@ -69,7 +69,7 @@ export default function PageConnexion() {
 
         <form onSubmit={gererSoumission} className="connexion-formulaire">
           {erreur && (
-            <div className="alerte alerte--erreur">
+            <div className="alerte">
               {erreur}
             </div>
           )}
@@ -77,25 +77,24 @@ export default function PageConnexion() {
           <div className="champ-groupe">
             <label className="champ-label" htmlFor="email">Adresse email</label>
             <div className="connexion-champ-icone">
-              <Mail size={18} className="connexion-icone" />
               <input
                 id="email"
                 type="email"
                 className="champ-saisie"
-                placeholder="admin@sweet-cake.fr"
+                placeholder="Ex: admin@sweet-cake.fr"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoFocus
-                style={{ paddingLeft: '40px' }}
+                style={{ paddingLeft: '48px' }}
               />
+              <Mail size={20} className="connexion-icone" />
             </div>
           </div>
 
           <div className="champ-groupe">
             <label className="champ-label" htmlFor="mot-de-passe">Mot de passe</label>
             <div className="connexion-champ-icone">
-              <Lock size={18} className="connexion-icone" />
               <input
                 id="mot-de-passe"
                 type={afficherMdp ? 'text' : 'password'}
@@ -104,28 +103,29 @@ export default function PageConnexion() {
                 value={motDePasse}
                 onChange={(e) => setMotDePasse(e.target.value)}
                 required
-                style={{ paddingLeft: '40px', paddingRight: '44px' }}
+                style={{ paddingLeft: '48px', paddingRight: '48px' }}
               />
+              <Lock size={20} className="connexion-icone" />
               <button
                 type="button"
                 className="connexion-toggle-mdp"
                 onClick={() => setAfficherMdp(!afficherMdp)}
                 tabIndex={-1}
               >
-                {afficherMdp ? <EyeOff size={18} /> : <Eye size={18} />}
+                {afficherMdp ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
           </div>
 
           <button
             type="submit"
-            className="bouton bouton--primaire bouton--lg bouton--plein"
+            className="bouton-connexion"
             disabled={chargement}
           >
             {chargement ? (
               <span className="chargement-spinner" style={{ width: 20, height: 20, borderWidth: 2 }} />
             ) : (
-              'Se connecter'
+              'Accéder au Back-Office'
             )}
           </button>
         </form>

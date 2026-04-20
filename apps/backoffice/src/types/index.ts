@@ -54,13 +54,19 @@ export interface LigneCommande {
 export interface Commande {
   id: number;
   client_id: number;
+  numero_commande?: string;
   type_commande: string;
   statut: string;
-  total: number;
+  statut_paiement?: string;
+  montant_total: number | string;
+  /** alias fréquemment utilisé dans le back-office */
+  total: number | string;
   notes?: string;
   planifiee_pour?: string;
+  annulee_at?: string;
   client?: Utilisateur;
   lignes?: LigneCommande[];
+  lignes_commande?: LigneCommande[];
   created_at: string;
   updated_at: string;
 }

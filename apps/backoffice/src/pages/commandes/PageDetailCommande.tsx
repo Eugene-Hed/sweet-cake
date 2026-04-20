@@ -9,6 +9,7 @@ import { commandesService } from '@/services/commandes.service';
 import Badge, { varianteStatutCommande, labelStatut } from '@/composants/communs/Badge';
 import Confirmation from '@/composants/communs/Confirmation';
 import type { Commande, HistoriqueStatut } from '@/types';
+import { formaterFCFA } from '@/utilitaires/formatage';
 import { TRANSITIONS_STATUT_COMMANDE } from '@sweet-cake/shared';
 import toast from 'react-hot-toast';
 import './PageCommandes.css';
@@ -91,18 +92,18 @@ export default function PageDetailCommande() {
           <table className="tableau" style={{ fontSize: '14px' }}>
             <thead><tr><th>Produit</th><th>Qté</th><th>Prix unit.</th><th>Sous-total</th></tr></thead>
             <tbody>
-              {commande.lignes && commande.lignes.length > 0 ? commande.lignes.map((l) => (
+              {(commande.lignes_commande || commande.lignes) && (commande.lignes_commande || commande.lignes)!.length > 0 ? (commande.lignes_commande || commande.lignes)!.map((l) => (
                 <tr key={l.id}>
                   <td>{l.produit?.nom || `Produit #${l.produit_id}`}</td>
                   <td>{l.quantite}</td>
-                  <td>{Number(l.prix_unitaire).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
-                  <td><strong>{Number(l.sous_total).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</strong></td>
+                  <td>{formaterFCFA(l.prix_unitaire)}</td>
+                  <td><strong>{formaterFCFA(l.sous_total)}</strong></td>
                 </tr>
               )) : <tr><td colSpan={4} className="tableau-vide">Aucun article</td></tr>}
             </tbody>
             <tfoot>
               <tr><td colSpan={3} style={{ textAlign: 'right', fontWeight: 600 }}>Total</td>
-                <td><strong style={{ color: 'var(--couleur-primaire)', fontSize: 16 }}>{Number(commande.total).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</strong></td>
+                <td><strong style={{ color: 'var(--couleur-primaire)', fontSize: 16 }}>{formaterFCFA(commande.montant_total || commande.total)}</strong></td>
               </tr>
             </tfoot>
           </table>

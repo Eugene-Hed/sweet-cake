@@ -73,7 +73,10 @@ export class TableauDeBordService {
                     label: new Date(s.date).toLocaleDateString('fr-FR', { weekday: 'short' }),
                     valeur: Number(s.total) || 0
                 })),
-                stats_categories: statsCategories,
+                stats_categories: statsCategories.map(c => ({
+                    label: c.label,
+                    valeur: Number(c.valeur) || 0
+                })),
             },
         };
     }

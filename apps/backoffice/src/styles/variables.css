@@ -1,6 +1,6 @@
 /* =============================================================================
  * Sweet-Cake Design System — Variables CSS
- * Génère depuis @sweet-cake/shared/design
+ * Aligné sur @sweet-cake/shared/design
  * ============================================================================= */
 
 :root {
@@ -38,6 +38,8 @@
   --couleur-fond-secondaire: #F5F5F5;
   --couleur-surface: #FFFFFF;
   --couleur-surface-elevee: #FFFFFF;
+  --couleur-surface-transparente: rgba(255, 255, 255, 0.8);
+  --couleur-overlay: rgba(0, 0, 0, 0.4);
 
   /* --- Textes --- */
   --couleur-texte-principal: #212121;
@@ -64,13 +66,14 @@
 
   /* --- Typographie --- */
   --police-principale: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --taille-titre-principal: 32px;
-  --taille-titre-secondaire: 24px;
-  --taille-sous-titre: 20px;
-  --taille-texte-corps: 16px;
-  --taille-texte-secondaire: 14px;
-  --taille-texte-bouton: 14px;
-  --taille-legende: 12px;
+  --taille-titre-principal: 2rem;       /* 32px */
+  --taille-titre-secondaire: 1.5rem;    /* 24px */
+  --taille-sous-titre: 1.25rem;         /* 20px */
+  --taille-texte-corps: 1rem;           /* 16px */
+  --taille-texte-secondaire: 0.875rem;  /* 14px */
+  --taille-texte-bouton: 0.875rem;      /* 14px */
+  --taille-legende: 0.75rem;            /* 12px */
+  
   --poids-normal: 400;
   --poids-medium: 500;
   --poids-semi-gras: 600;
@@ -101,10 +104,11 @@
 
   /* --- Ombres --- */
   --ombre-aucune: none;
-  --ombre-sm: 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.1);
-  --ombre-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
-  --ombre-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
-  --ombre-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 8px 10px rgba(0, 0, 0, 0.04);
+  --ombre-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --ombre-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --ombre-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --ombre-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --ombre-premium: 0 10px 40px -10px rgba(232, 96, 138, 0.15);
 
   /* --- Tailles --- */
   --taille-bouton-sm: 32px;
@@ -120,9 +124,9 @@
   --hauteur-entete: 64px;
 
   /* --- Transitions --- */
-  --transition-rapide: 150ms ease;
-  --transition-normale: 250ms ease;
-  --transition-lente: 350ms ease;
+  --transition-rapide: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normale: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-lente: 350ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* --- Thème sombre --- */
@@ -138,25 +142,26 @@
   --couleur-accent-fonce: #D4883E;
 
   --couleur-succes: #4ADE80;
-  --couleur-succes-clair: #1A3A2A;
+  --couleur-succes-clair: rgba(74, 222, 128, 0.1);
   --couleur-erreur: #F87171;
-  --couleur-erreur-clair: #3A1A1A;
+  --couleur-erreur-clair: rgba(248, 113, 113, 0.1);
   --couleur-avertissement: #FBBF24;
-  --couleur-avertissement-clair: #3A3018;
+  --couleur-avertissement-clair: rgba(251, 191, 36, 0.1);
   --couleur-information: #38BDF8;
-  --couleur-information-clair: #18293A;
+  --couleur-information-clair: rgba(56, 189, 248, 0.1);
 
   --couleur-fond: #0F0F1A;
   --couleur-fond-secondaire: #1A1A2E;
-  --couleur-surface: #242438;
-  --couleur-surface-elevee: #2E2E48;
+  --couleur-surface: #1E1E2F;
+  --couleur-surface-elevee: #29293F;
+  --couleur-surface-transparente: rgba(30, 30, 47, 0.8);
 
   --couleur-texte-principal: #F0F0F5;
   --couleur-texte-secondaire: #A0A0B8;
   --couleur-texte-desactive: #606078;
   --couleur-texte-inverse: #212121;
 
-  --couleur-bordure: #3A3A50;
+  --couleur-bordure: #36364D;
   --couleur-bordure-legere: #2E2E42;
   --couleur-diviseur: #2A2A3E;
 
@@ -170,4 +175,9 @@
   --gris-700: #C0C0D0;
   --gris-800: #D0D0E0;
   --gris-900: #F0F0F5;
+  
+  --ombre-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --ombre-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  --ombre-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+  --ombre-premium: 0 10px 40px -10px rgba(0, 0, 0, 1);
 }

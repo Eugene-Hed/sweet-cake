@@ -15,12 +15,17 @@ import PageTableauDeBord from '@/pages/tableau-de-bord/PageTableauDeBord';
 import PageUtilisateurs from '@/pages/utilisateurs/PageUtilisateurs';
 import PageDetailUtilisateur from '@/pages/utilisateurs/PageDetailUtilisateur';
 import PageCategories from '@/pages/categories/PageCategories';
+import PageFormulaireCategorie from '@/pages/categories/PageFormulaireCategorie';
 import PageProduits from '@/pages/produits/PageProduits';
+import PageFormulaireProduit from '@/pages/produits/PageFormulaireProduit';
 import PageCommandes from '@/pages/commandes/PageCommandes';
 import PageDetailCommande from '@/pages/commandes/PageDetailCommande';
 import PageAteliers from '@/pages/ateliers/PageAteliers';
+import PageFormulaireAtelier from '@/pages/ateliers/PageFormulaireAtelier';
 import PageReservations from '@/pages/reservations/PageReservations';
 import PageStock from '@/pages/stock/PageStock';
+import PageFormulaireStock from '@/pages/stock/PageFormulaireStock';
+import PageMouvementStock from '@/pages/stock/PageMouvementStock';
 import PageAudit from '@/pages/audit/PageAudit';
 
 const rolesAdmin = ['administrateur', 'gestionnaire'];
@@ -30,7 +35,7 @@ export default function App() {
   return (
     <ThemeFournisseur>
       <AuthFournisseur>
-        <BrowserRouter>
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Routes>
             {/* Page publique */}
             <Route path="/connexion" element={<PageConnexion />} />
@@ -45,10 +50,16 @@ export default function App() {
             >
               <Route path="/" element={<PageTableauDeBord />} />
               <Route path="/categories" element={<PageCategories />} />
+              <Route path="/categories/nouveau" element={<PageFormulaireCategorie />} />
+              <Route path="/categories/:id" element={<PageFormulaireCategorie />} />
               <Route path="/produits" element={<PageProduits />} />
+              <Route path="/produits/nouveau" element={<PageFormulaireProduit />} />
+              <Route path="/produits/:id" element={<PageFormulaireProduit />} />
               <Route path="/commandes" element={<PageCommandes />} />
               <Route path="/commandes/:id" element={<PageDetailCommande />} />
               <Route path="/ateliers" element={<PageAteliers />} />
+              <Route path="/ateliers/nouveau" element={<PageFormulaireAtelier />} />
+              <Route path="/ateliers/:id" element={<PageFormulaireAtelier />} />
               <Route path="/reservations" element={<PageReservations />} />
 
               {/* Routes admin uniquement */}
@@ -60,6 +71,15 @@ export default function App() {
               } />
               <Route path="/stock" element={
                 <RouteProtegee rolesAutorises={roleAdminSeul}><PageStock /></RouteProtegee>
+              } />
+              <Route path="/stock/nouveau" element={
+                <RouteProtegee rolesAutorises={roleAdminSeul}><PageFormulaireStock /></RouteProtegee>
+              } />
+              <Route path="/stock/:id" element={
+                <RouteProtegee rolesAutorises={roleAdminSeul}><PageFormulaireStock /></RouteProtegee>
+              } />
+              <Route path="/stock/:id/mouvement" element={
+                <RouteProtegee rolesAutorises={roleAdminSeul}><PageMouvementStock /></RouteProtegee>
               } />
               <Route path="/audit" element={
                 <RouteProtegee rolesAutorises={roleAdminSeul}><PageAudit /></RouteProtegee>
